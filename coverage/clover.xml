@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <coverage generated="1764079366470" clover="3.2.0">
   <project timestamp="1764079366470" name="All files">
     <metrics statements="145" coveredstatements="145" conditionals="18" coveredconditionals="18" methods="4" coveredmethods="4" elements="167" coveredelements="167" complexity="0" loc="145" ncloc="145" packages="3" files="8" classes="8"/>
     <package name="src">
       <metrics statements="49" coveredstatements="49" conditionals="4" coveredconditionals="4" methods="0" coveredmethods="0"/>
       <file name="app.js" path="E:\ReelEcho\src\app.js">
+=======
+<coverage generated="1764079391450" clover="3.2.0">
+  <project timestamp="1764079391450" name="All files">
+    <metrics statements="134" coveredstatements="123" conditionals="18" coveredconditionals="17" methods="5" coveredmethods="4" elements="157" coveredelements="144" complexity="0" loc="134" ncloc="134" packages="3" files="8" classes="8"/>
+    <package name="src">
+      <metrics statements="49" coveredstatements="38" conditionals="4" coveredconditionals="3" methods="1" coveredmethods="0"/>
+      <file name="app.js" path="/home/davidesiclari/Downloads/ReelEcho/src/app.js">
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <metrics statements="38" coveredstatements="38" conditionals="3" coveredconditionals="3" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -33,11 +42,19 @@
         <line num="25" count="1" type="stmt"/>
         <line num="26" count="1" type="cond" truecount="1" falsecount="0"/>
         <line num="27" count="1" type="cond" truecount="1" falsecount="0"/>
+<<<<<<< HEAD
         <line num="28" count="15" type="stmt"/>
         <line num="29" count="15" type="stmt"/>
         <line num="30" count="15" type="stmt"/>
         <line num="31" count="15" type="stmt"/>
         <line num="32" count="15" type="stmt"/>
+=======
+        <line num="28" count="12" type="stmt"/>
+        <line num="29" count="12" type="stmt"/>
+        <line num="30" count="12" type="stmt"/>
+        <line num="31" count="12" type="stmt"/>
+        <line num="32" count="12" type="stmt"/>
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <line num="33" count="1" type="stmt"/>
         <line num="34" count="1" type="stmt"/>
         <line num="35" count="1" type="stmt"/>
@@ -45,6 +62,7 @@
         <line num="37" count="1" type="stmt"/>
         <line num="38" count="1" type="stmt"/>
       </file>
+<<<<<<< HEAD
       <file name="index.js" path="E:\ReelEcho\src\index.js">
         <metrics statements="11" coveredstatements="11" conditionals="1" coveredconditionals="1" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
@@ -64,6 +82,27 @@
       <metrics statements="56" coveredstatements="56" conditionals="3" coveredconditionals="3" methods="0" coveredmethods="0"/>
       <file name="boom.route.js" path="E:\ReelEcho\src\routes\auto\boom.route.js">
         <metrics statements="19" coveredstatements="19" conditionals="1" coveredconditionals="1" methods="0" coveredmethods="0"/>
+=======
+      <file name="index.js" path="/home/davidesiclari/Downloads/ReelEcho/src/index.js">
+        <metrics statements="11" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="1" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.routes.auto">
+      <metrics statements="51" coveredstatements="51" conditionals="3" coveredconditionals="3" methods="0" coveredmethods="0"/>
+      <file name="boom.route.js" path="/home/davidesiclari/Downloads/ReelEcho/src/routes/auto/boom.route.js">
+        <metrics statements="14" coveredstatements="14" conditionals="1" coveredconditionals="1" methods="0" coveredmethods="0"/>
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -78,6 +117,7 @@
         <line num="12" count="1" type="stmt"/>
         <line num="13" count="1" type="stmt"/>
         <line num="14" count="1" type="stmt"/>
+<<<<<<< HEAD
         <line num="15" count="1" type="stmt"/>
         <line num="16" count="1" type="stmt"/>
         <line num="17" count="1" type="stmt"/>
@@ -85,6 +125,10 @@
         <line num="19" count="1" type="stmt"/>
       </file>
       <file name="info.route.js" path="E:\ReelEcho\src\routes\auto\info.route.js">
+=======
+      </file>
+      <file name="info.route.js" path="/home/davidesiclari/Downloads/ReelEcho/src/routes/auto/info.route.js">
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <metrics statements="15" coveredstatements="15" conditionals="1" coveredconditionals="1" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -102,7 +146,11 @@
         <line num="14" count="1" type="stmt"/>
         <line num="15" count="1" type="stmt"/>
       </file>
+<<<<<<< HEAD
       <file name="version.route.js" path="E:\ReelEcho\src\routes\auto\version.route.js">
+=======
+      <file name="version.route.js" path="/home/davidesiclari/Downloads/ReelEcho/src/routes/auto/version.route.js">
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <metrics statements="22" coveredstatements="22" conditionals="1" coveredconditionals="1" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -129,13 +177,20 @@
       </file>
     </package>
     <package name="src.utils">
+<<<<<<< HEAD
       <metrics statements="40" coveredstatements="40" conditionals="11" coveredconditionals="11" methods="4" coveredmethods="4"/>
       <file name="appInfo.js" path="E:\ReelEcho\src\utils\appInfo.js">
         <metrics statements="21" coveredstatements="21" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+=======
+      <metrics statements="34" coveredstatements="34" conditionals="11" coveredconditionals="11" methods="4" coveredmethods="4"/>
+      <file name="appInfo.js" path="/home/davidesiclari/Downloads/ReelEcho/src/utils/appInfo.js">
+        <metrics statements="15" coveredstatements="15" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
+<<<<<<< HEAD
         <line num="5" count="1" type="stmt"/>
         <line num="6" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
@@ -143,18 +198,29 @@
         <line num="9" count="1" type="stmt"/>
         <line num="10" count="1" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
+=======
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <line num="12" count="1" type="cond" truecount="1" falsecount="0"/>
         <line num="13" count="3" type="stmt"/>
         <line num="14" count="3" type="stmt"/>
         <line num="15" count="3" type="stmt"/>
         <line num="16" count="3" type="stmt"/>
         <line num="17" count="3" type="stmt"/>
+<<<<<<< HEAD
         <line num="18" count="1" type="stmt"/>
+=======
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <line num="19" count="1" type="cond" truecount="1" falsecount="0"/>
         <line num="20" count="4" type="stmt"/>
         <line num="21" count="4" type="stmt"/>
       </file>
+<<<<<<< HEAD
       <file name="errorHandler.js" path="E:\ReelEcho\src\utils\errorHandler.js">
+=======
+      <file name="errorHandler.js" path="/home/davidesiclari/Downloads/ReelEcho/src/utils/errorHandler.js">
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <metrics statements="9" coveredstatements="9" conditionals="3" coveredconditionals="3" methods="1" coveredmethods="1"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -166,16 +232,26 @@
         <line num="8" count="3" type="stmt"/>
         <line num="9" count="3" type="stmt"/>
       </file>
+<<<<<<< HEAD
       <file name="status.js" path="E:\ReelEcho\src\utils\status.js">
+=======
+      <file name="status.js" path="/home/davidesiclari/Downloads/ReelEcho/src/utils/status.js">
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <metrics statements="10" coveredstatements="10" conditionals="6" coveredconditionals="6" methods="1" coveredmethods="1"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
         <line num="5" count="1" type="cond" truecount="1" falsecount="0"/>
+<<<<<<< HEAD
         <line num="6" count="4" type="cond" truecount="1" falsecount="0"/>
         <line num="7" count="4" type="cond" truecount="2" falsecount="0"/>
         <line num="8" count="4" type="cond" truecount="2" falsecount="0"/>
+=======
+        <line num="6" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="7" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="8" count="4" type="cond" truecount="1" falsecount="0"/>
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
         <line num="9" count="1" type="stmt"/>
         <line num="10" count="1" type="stmt"/>
       </file>

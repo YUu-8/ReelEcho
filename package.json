@@ -14,9 +14,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "mongodb": "^7.0.0"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@vitest/coverage-v8": "^2.0.5",
     "eslint": "^9.12.0",
     "eslint-config-standard": "^17.1.0",
@@ -26,6 +29,20 @@
     "nodemon": "^3.1.11",
     "supertest": "^7.0.0",
     "vitest": "^2.0.5"
+=======
+    "@eslint/js": "^9.39.1",
+    "@vitest/coverage-v8": "^4.0.13",
+    "eslint": "^8.57.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.6.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.5.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.0.0",
+    "vitest": "^4.0.13"
+>>>>>>> cebef46831440d912b6daecb78164b010be0c0bc
   },
   "vitest": {
     "coverage": {
