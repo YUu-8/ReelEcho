@@ -12,6 +12,27 @@ router.get("/", (req, res) => {
   res.status(200).json(posts);
 });
 
+// GET /api/posts/:id
+// Get a single post by id.
+router.get("/:id", (req, res) => {
+  const postId = Number(req.params.id)
+  // Simple validation for the id param
+  if (!Number.isInteger(postId)) {
+    return res.status(400).json({ error: "Invalid post id" })
+  }
+
+  // Find the post in the in-memory array
+  const post = posts.find((p) => p.id === postId)
+
+  // If not found, return 404
+  if (!post) {
+    return res.status(404).json({ error: "Post not found" })
+  }
+
+  // If found, return 200 + the post
+  return res.status(200).json(post)
+})
+
 // POST /api/posts
 // Create a new post (share) linked to a review.
 router.post("/", (req, res) => {
