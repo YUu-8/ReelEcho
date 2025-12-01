@@ -24,7 +24,7 @@ describe("Posts API (/api/posts)", () => {
 
     expect(res.status).toBe(201);
 
-    // New post should have id and post_date (auto-generated).
+    // New post should have id and post_date.
     expect(res.body).toHaveProperty("id");
     expect(res.body).toHaveProperty("post_date");
     expect(typeof res.body.post_date).toBe("string");
