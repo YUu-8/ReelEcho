@@ -31,6 +31,25 @@ describe("Posts API (/api/posts)", () => {
     expect(res.body.content).toBe(payload.content);
   });
 
+  it("GET /api/posts/:id should return a single post", async () => {
+  // First create a post
+    const createRes = await request(app).post("/api/posts").send({
+      userid: 10,
+      content: "Detail view",
+      reviewid: 555,
+    })
+
+    const createdId = createRes.body.id
+
+    // Then retrieve it by id
+    const getRes = await request(app).get(`/api/posts/${createdId}`)
+
+    expect(getRes.status).toBe(200)
+    expect(getRes.body).toHaveProperty("id", createdId)
+    expect(getRes.body).toHaveProperty("content", "Detail view")
+  })
+
+
   it("POST /api/posts should return 400 when required fields are missing", async () => {
     // Missing reviewid
     const res = await request(app)
