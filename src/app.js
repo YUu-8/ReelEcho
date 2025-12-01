@@ -4,17 +4,22 @@
  *  - Base routes (/, /health)
  *  - Auto-mount all routers in src/routes/auto/*.route.js
  *  - Global error handler (consistent JSON for errors)
+ *  - MongoDB connection
  */
 import express from 'express'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { errorHandler } from './utils/errorHandler.js'
+import { connectToDb } from './db/mongo.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
+
+// Connect to MongoDB
+await connectToDb()
 
 // Simple root + health endpoints
 app.get('/', (_req, res) => res.json({ ok: true, message: 'Hello from CI/CD demo 👋' }))
@@ -28,7 +33,13 @@ if (fs.existsSync(autoDir)) {
     const full = path.join(autoDir, f)
     const mod = await import(pathToFileURL(full).href)
     const router = mod.default
-    if (router) app.use('/', router)
+    if (router) {
+      // Extract entity name from filename (e.g., 'users.route.js' -> 'users')
+      const entityName = f.replace('.route.js', '')
+      // Mount at /api/<entity> for entity routes, otherwise at root
+      const mountPath = ['boom', 'info', 'version'].includes(entityName) ? '/' : `/api/${entityName}`
+      app.use(mountPath, router)
+    }
   }
 }
 
