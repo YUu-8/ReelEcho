@@ -1,32 +1,32 @@
-import { describe, it, expect } from "vitest"; // 手动导入测试所需变量
+import { describe, it, expect } from "vitest"; // Manually import required test variables
 import request from "supertest";
 import app from "../src/app.js";
 
-// 测试套件：Review API 所有接口
+// Test Suite: Review API All Endpoints
 describe("Reviews API (/api/reviews)", () => {
-  // 测试 1：GET 所有评论 → 返回 200 和数组
-  it("GET /api/reviews 应返回 200 和评论数组", async () => {
+  // Test 1: GET all reviews → Returns 200 and array
+  it("GET /api/reviews should return 200 and reviews array", async () => {
     const res = await request(app).get("/api/reviews");
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-  // 测试 2：GET 单个存在的评论 → 返回 200 和评论详情
-  it("GET /api/reviews/:reviewid 应返回存在的评论", async () => {
+  // Test 2: GET single existing review → Returns 200 and review details
+  it("GET /api/reviews/:reviewid should return existing review", async () => {
     const res = await request(app).get("/api/reviews/1");
     expect(res.status).toBe(200);
     expect(res.body.reviewid).toBe(1);
   });
 
-  // 测试 3：GET 不存在的评论 → 返回 404
-  it("GET /api/reviews/:reviewid 应返回 404（评论不存在）", async () => {
+  // Test 3: GET non-existent review → Returns 404
+  it("GET /api/reviews/:reviewid should return 404 (review not found)", async () => {
     const res = await request(app).get("/api/reviews/999");
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty("error");
   });
 
-  // 测试 4：POST 新增评论 → 返回 201 和新评论
-  it("POST /api/reviews 应创建新评论并返回 201", async () => {
+  // Test 4: POST new review → Returns 201 and new review
+  it("POST /api/reviews should create new review and return 201", async () => {
     const res = await request(app)
       .post("/api/reviews")
       .send({
@@ -34,7 +34,7 @@ describe("Reviews API (/api/reviews)", () => {
         content_type: "tv",
         content_id: 201,
         score: 9.0,
-        comment: "太精彩了！",
+        comment: "Amazing!",
         mood: "excited",
         emoji: "🎉"
       });
@@ -43,8 +43,8 @@ describe("Reviews API (/api/reviews)", () => {
     expect(res.body.content_type).toBe("tv");
   });
 
-  // 测试 5：POST 重复评论 → 返回 409 冲突
-  it("POST /api/reviews 应返回 409（重复评论）", async () => {
+  // Test 5: POST duplicate review → Returns 409 Conflict
+  it("POST /api/reviews should return 409 (duplicate review)", async () => {
     const res = await request(app)
       .post("/api/reviews")
       .send({
@@ -56,26 +56,26 @@ describe("Reviews API (/api/reviews)", () => {
     expect(res.status).toBe(409);
   });
 
-  // 测试 6：POST 缺少必填字段 → 返回 400
-  it("POST /api/reviews 应返回 400（缺少必填字段）", async () => {
+  // Test 6: POST missing required fields → Returns 400
+  it("POST /api/reviews should return 400 (missing required fields)", async () => {
     const res = await request(app)
       .post("/api/reviews")
       .send({ userid: 1, content_type: "movie" });
     expect(res.status).toBe(400);
   });
 
-  // 测试 7：PUT 更新评论 → 返回 200 和更新后的评论
-  it("PUT /api/reviews/:reviewid 应更新评论并返回 200", async () => {
+  // Test 7: PUT update review → Returns 200 and updated review
+  it("PUT /api/reviews/:reviewid should update review and return 200", async () => {
     const res = await request(app)
       .put("/api/reviews/1")
-      .send({ score: 9.5, comment: "更新后的评论" });
+      .send({ score: 9.5, comment: "Updated comment" });
     expect(res.status).toBe(200);
     expect(res.body.score).toBe(9.5);
-    expect(res.body.comment).toBe("更新后的评论");
+    expect(res.body.comment).toBe("Updated comment");
   });
 
-  // 测试 8：DELETE 删除评论 → 返回 204 无内容
-  it("DELETE /api/reviews/:reviewid 应软删除评论并返回 204", async () => {
+  // Test 8: DELETE review → Returns 204 No Content
+  it("DELETE /api/reviews/:reviewid should soft delete review and return 204", async () => {
     const res = await request(app).delete("/api/reviews/1");
     expect(res.status).toBe(204);
     const getRes = await request(app).get("/api/reviews/1");
