@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 // Import Vitest test utilities
 import { beforeEach, describe, it, expect } from 'vitest';
 // Correct path: test/unit → src/route
-import favouriteRoutes, { favouriteLists } from '../src/routes/auto/favourites.routes.js';
+import favouriteRoutes, { favouriteLists } from '../src/routes/auto/favourites.route.js';
 
 const app = express();
 app.use(bodyParser.json());
