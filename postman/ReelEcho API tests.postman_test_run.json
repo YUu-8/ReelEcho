@@ -1,22 +1,22 @@
 {
-	"id": "0b1f58e4-8f64-43e3-987a-3d95138008d2",
+	"id": "c54538ad-fa17-4088-8431-ff0c40e287de",
 	"name": "ReelEcho API tests",
-	"timestamp": "2025-12-03T15:36:25.763Z",
+	"timestamp": "2025-12-03T16:31:39.941Z",
 	"collection_id": "50495228-44b0a98c-db95-4020-a84e-4a7ef2262710",
 	"folder_id": 0,
 	"environment_id": "0",
-	"totalPass": 6,
+	"totalPass": 10,
 	"delay": 0,
 	"persist": true,
 	"status": "finished",
-	"startedAt": "2025-12-03T15:36:24.578Z",
-	"totalFail": 16,
+	"startedAt": "2025-12-03T16:31:38.662Z",
+	"totalFail": 11,
 	"results": [
 		{
 			"id": "e011d394-768f-4f7e-ab73-82e09fbf5efc",
 			"name": "GET ALL USER",
 			"url": "http://localhost:3000/api/users",
-			"time": 20,
+			"time": 23,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -36,7 +36,7 @@
 				}
 			},
 			"times": [
-				20
+				23
 			],
 			"allTests": [
 				{
@@ -49,32 +49,26 @@
 			"id": "c5727ee7-dbe8-4f16-8da8-668e0651e131",
 			"name": "POST NEW USER",
 			"url": "http://localhost:3000/api/users",
-			"time": 316,
+			"time": 26,
 			"responseCode": {
-				"code": 400,
-				"name": "Bad Request"
+				"code": 201,
+				"name": "Created"
 			},
 			"tests": {
-				"Status code is 201": false,
-				"Response contains user ID": false
+				"Response contains user ID": true
 			},
 			"testPassFailCounts": {
-				"Status code is 201": {
-					"pass": 0,
-					"fail": 1
-				},
 				"Response contains user ID": {
-					"pass": 0,
-					"fail": 1
+					"pass": 1,
+					"fail": 0
 				}
 			},
 			"times": [
-				316
+				26
 			],
 			"allTests": [
 				{
-					"Status code is 201": false,
-					"Response contains user ID": false
+					"Response contains user ID": true
 				}
 			]
 		},
@@ -82,38 +76,38 @@
 			"id": "41043f0c-9fb9-4420-9b96-a08483bc2f0d",
 			"name": "GET ALL REVIEWS",
 			"url": "http://localhost:3000/api/reviews",
-			"time": 3,
+			"time": 2,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
 			},
 			"tests": {
 				"Status code is 200": true,
-				"Response is an array of comments": true,
-				"Comments contain the 'content' field": false
+				"Response is an array of reviews": true,
+				"Comments contain the 'comment' field": true
 			},
 			"testPassFailCounts": {
 				"Status code is 200": {
 					"pass": 1,
 					"fail": 0
 				},
-				"Response is an array of comments": {
+				"Response is an array of reviews": {
 					"pass": 1,
 					"fail": 0
 				},
-				"Comments contain the 'content' field": {
-					"pass": 0,
-					"fail": 1
+				"Comments contain the 'comment' field": {
+					"pass": 1,
+					"fail": 0
 				}
 			},
 			"times": [
-				3
+				2
 			],
 			"allTests": [
 				{
 					"Status code is 200": true,
-					"Response is an array of comments": true,
-					"Comments contain the 'content' field": false
+					"Response is an array of reviews": true,
+					"Comments contain the 'comment' field": true
 				}
 			]
 		},
@@ -121,10 +115,10 @@
 			"id": "6b265aae-9f6b-4269-a41e-5b9610403177",
 			"name": "POST NEW REVIEWS",
 			"url": "http://localhost:3000/api/reviews",
-			"time": 3,
+			"time": 2,
 			"responseCode": {
-				"code": 400,
-				"name": "Bad Request"
+				"code": 409,
+				"name": "Conflict"
 			},
 			"tests": {
 				"Status code is 201 (Created successfully)": false,
@@ -146,7 +140,7 @@
 				}
 			},
 			"times": [
-				3
+				2
 			],
 			"allTests": [
 				{
@@ -160,38 +154,38 @@
 			"id": "cf6a60bc-f7d7-4219-9da0-82d797d6e6f5",
 			"name": "GET ALL FAVOURITES",
 			"url": "http://localhost:3000/api/favourites",
-			"time": 3,
+			"time": 2,
 			"responseCode": {
 				"code": 400,
 				"name": "Bad Request"
 			},
 			"tests": {
 				"Status code is 200": false,
-				"Response is an array of favorites": false,
-				"Favorites contain the 'userId' and 'postId' fields": false
+				"Response is an array of favourites": false,
+				"Favourites contain the 'userid' and 'content_id' fields": true
 			},
 			"testPassFailCounts": {
 				"Status code is 200": {
 					"pass": 0,
 					"fail": 1
 				},
-				"Response is an array of favorites": {
+				"Response is an array of favourites": {
 					"pass": 0,
 					"fail": 1
 				},
-				"Favorites contain the 'userId' and 'postId' fields": {
-					"pass": 0,
-					"fail": 1
+				"Favourites contain the 'userid' and 'content_id' fields": {
+					"pass": 1,
+					"fail": 0
 				}
 			},
 			"times": [
-				3
+				2
 			],
 			"allTests": [
 				{
 					"Status code is 200": false,
-					"Response is an array of favorites": false,
-					"Favorites contain the 'userId' and 'postId' fields": false
+					"Response is an array of favourites": false,
+					"Favourites contain the 'userid' and 'content_id' fields": true
 				}
 			]
 		},
@@ -206,19 +200,19 @@
 			},
 			"tests": {
 				"Status code is 201": false,
-				"Response contains favorite ID": false,
-				"Favorite's associated user ID and post ID are correct": false
+				"Response contains favourite ID": false,
+				"Favourite's associated user ID and content ID are correct": false
 			},
 			"testPassFailCounts": {
 				"Status code is 201": {
 					"pass": 0,
 					"fail": 1
 				},
-				"Response contains favorite ID": {
+				"Response contains favourite ID": {
 					"pass": 0,
 					"fail": 1
 				},
-				"Favorite's associated user ID and post ID are correct": {
+				"Favourite's associated user ID and content ID are correct": {
 					"pass": 0,
 					"fail": 1
 				}
@@ -229,8 +223,8 @@
 			"allTests": [
 				{
 					"Status code is 201": false,
-					"Response contains favorite ID": false,
-					"Favorite's associated user ID and post ID are correct": false
+					"Response contains favourite ID": false,
+					"Favourite's associated user ID and content ID are correct": false
 				}
 			]
 		},
@@ -238,7 +232,7 @@
 			"id": "04aea8c2-9093-4880-bef7-b0bf98c403c5",
 			"name": "GET ALL POSTS",
 			"url": "http://localhost:3000/api/posts",
-			"time": 3,
+			"time": 2,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -246,7 +240,7 @@
 			"tests": {
 				"Status code is 200": true,
 				"Response is an array of posts": true,
-				"Posts contain the 'title' and 'content' fields": false
+				"Posts contain the 'title' and 'content' fields": true
 			},
 			"testPassFailCounts": {
 				"Status code is 200": {
@@ -258,18 +252,18 @@
 					"fail": 0
 				},
 				"Posts contain the 'title' and 'content' fields": {
-					"pass": 0,
-					"fail": 1
+					"pass": 1,
+					"fail": 0
 				}
 			},
 			"times": [
-				3
+				2
 			],
 			"allTests": [
 				{
 					"Status code is 200": true,
 					"Response is an array of posts": true,
-					"Posts contain the 'title' and 'content' fields": false
+					"Posts contain the 'title' and 'content' fields": true
 				}
 			]
 		},
@@ -277,7 +271,7 @@
 			"id": "5404af2a-8f1c-4434-abbb-ef72a922461c",
 			"name": "POST NEW POSTS",
 			"url": "http://localhost:3000/api/posts",
-			"time": 4,
+			"time": 2,
 			"responseCode": {
 				"code": 400,
 				"name": "Bad Request"
@@ -302,7 +296,7 @@
 				}
 			},
 			"times": [
-				4
+				2
 			],
 			"allTests": [
 				{
@@ -314,7 +308,7 @@
 		}
 	],
 	"count": 1,
-	"totalTime": 354,
+	"totalTime": 61,
 	"collection": {
 		"requests": [
 			{
