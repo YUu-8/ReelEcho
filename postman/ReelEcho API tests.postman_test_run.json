@@ -1,0 +1,354 @@
+{
+	"id": "0b1f58e4-8f64-43e3-987a-3d95138008d2",
+	"name": "ReelEcho API tests",
+	"timestamp": "2025-12-03T15:36:25.763Z",
+	"collection_id": "50495228-44b0a98c-db95-4020-a84e-4a7ef2262710",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 6,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-12-03T15:36:24.578Z",
+	"totalFail": 16,
+	"results": [
+		{
+			"id": "e011d394-768f-4f7e-ab73-82e09fbf5efc",
+			"name": "GET ALL USER",
+			"url": "http://localhost:3000/api/users",
+			"time": 20,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response is an array of users": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response is an array of users": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				20
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response is an array of users": true
+				}
+			]
+		},
+		{
+			"id": "c5727ee7-dbe8-4f16-8da8-668e0651e131",
+			"name": "POST NEW USER",
+			"url": "http://localhost:3000/api/users",
+			"time": 316,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 201": false,
+				"Response contains user ID": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response contains user ID": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				316
+			],
+			"allTests": [
+				{
+					"Status code is 201": false,
+					"Response contains user ID": false
+				}
+			]
+		},
+		{
+			"id": "41043f0c-9fb9-4420-9b96-a08483bc2f0d",
+			"name": "GET ALL REVIEWS",
+			"url": "http://localhost:3000/api/reviews",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response is an array of comments": true,
+				"Comments contain the 'content' field": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response is an array of comments": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Comments contain the 'content' field": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response is an array of comments": true,
+					"Comments contain the 'content' field": false
+				}
+			]
+		},
+		{
+			"id": "6b265aae-9f6b-4269-a41e-5b9610403177",
+			"name": "POST NEW REVIEWS",
+			"url": "http://localhost:3000/api/reviews",
+			"time": 3,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 201 (Created successfully)": false,
+				"Response contains comment ID": false,
+				"Response content matches submitted content": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201 (Created successfully)": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response contains comment ID": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response content matches submitted content": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 201 (Created successfully)": false,
+					"Response contains comment ID": false,
+					"Response content matches submitted content": false
+				}
+			]
+		},
+		{
+			"id": "cf6a60bc-f7d7-4219-9da0-82d797d6e6f5",
+			"name": "GET ALL FAVOURITES",
+			"url": "http://localhost:3000/api/favourites",
+			"time": 3,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Response is an array of favorites": false,
+				"Favorites contain the 'userId' and 'postId' fields": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response is an array of favorites": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Favorites contain the 'userId' and 'postId' fields": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Response is an array of favorites": false,
+					"Favorites contain the 'userId' and 'postId' fields": false
+				}
+			]
+		},
+		{
+			"id": "e3a50884-8567-4b9e-af67-b98282d10c26",
+			"name": "POST NEW FAVOURITES",
+			"url": "http://localhost:3000/api/favourites",
+			"time": 2,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 201": false,
+				"Response contains favorite ID": false,
+				"Favorite's associated user ID and post ID are correct": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response contains favorite ID": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Favorite's associated user ID and post ID are correct": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status code is 201": false,
+					"Response contains favorite ID": false,
+					"Favorite's associated user ID and post ID are correct": false
+				}
+			]
+		},
+		{
+			"id": "04aea8c2-9093-4880-bef7-b0bf98c403c5",
+			"name": "GET ALL POSTS",
+			"url": "http://localhost:3000/api/posts",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response is an array of posts": true,
+				"Posts contain the 'title' and 'content' fields": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response is an array of posts": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Posts contain the 'title' and 'content' fields": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response is an array of posts": true,
+					"Posts contain the 'title' and 'content' fields": false
+				}
+			]
+		},
+		{
+			"id": "5404af2a-8f1c-4434-abbb-ef72a922461c",
+			"name": "POST NEW POSTS",
+			"url": "http://localhost:3000/api/posts",
+			"time": 4,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 201": false,
+				"Response contains post ID": false,
+				"Post title is correct": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response contains post ID": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Post title is correct": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Status code is 201": false,
+					"Response contains post ID": false,
+					"Post title is correct": false
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 354,
+	"collection": {
+		"requests": [
+			{
+				"id": "e011d394-768f-4f7e-ab73-82e09fbf5efc",
+				"method": "GET"
+			},
+			{
+				"id": "c5727ee7-dbe8-4f16-8da8-668e0651e131",
+				"method": "POST"
+			},
+			{
+				"id": "41043f0c-9fb9-4420-9b96-a08483bc2f0d",
+				"method": "GET"
+			},
+			{
+				"id": "6b265aae-9f6b-4269-a41e-5b9610403177",
+				"method": "POST"
+			},
+			{
+				"id": "cf6a60bc-f7d7-4219-9da0-82d797d6e6f5",
+				"method": "GET"
+			},
+			{
+				"id": "e3a50884-8567-4b9e-af67-b98282d10c26",
+				"method": "POST"
+			},
+			{
+				"id": "04aea8c2-9093-4880-bef7-b0bf98c403c5",
+				"method": "GET"
+			},
+			{
+				"id": "5404af2a-8f1c-4434-abbb-ef72a922461c",
+				"method": "POST"
+			}
+		]
+	}
+}
