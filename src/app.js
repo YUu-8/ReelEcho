@@ -11,7 +11,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { errorHandler } from './utils/errorHandler.js'
-import { connectToDb } from './db/mongo.js'
+import { connectToMongoose } from './db/mongoose.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -19,8 +19,8 @@ const __dirname = path.dirname(__filename)
 const app = express()
 app.use(express.json());//add to let POST get JSON
 
-// Connect to MongoDB
-await connectToDb()
+// Connect to MongoDB (Mongoose)
+await connectToMongoose()
 
 // Simple root + health endpoints
 app.get('/', (_req, res) => res.json({ ok: true, message: 'Hello from CI/CD demo 👋' }))

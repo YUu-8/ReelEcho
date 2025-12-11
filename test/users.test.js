@@ -1,71 +1,53 @@
-/**
- * Users API Tests
- */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
 import request from 'supertest'
 import app from '../src/app.js'
-import { getDb, closeDb } from '../src/db/mongo.js'
+import { connectToMongoose, closeMongoose } from '../src/db/mongoose.js'
+import User from '../src/models/user.model.js'
 
 let testUserId
 
 beforeAll(async () => {
-  // Wait for DB connection (app.js already connects)
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  await connectToMongoose()
 })
 
 afterAll(async () => {
-  // Clean up test data
-  try {
-    await getDb().collection('users').deleteMany({ email: /test|newuser/ })
-  } catch (error) {
-    // Ignore cleanup errors
-  }
-  await closeDb()
+  await closeMongoose()
 })
 
 beforeEach(async () => {
-  // Insert test users before each test suite
-  const existingUsers = await getDb().collection('users').find().toArray()
-  if (existingUsers.length === 0) {
-    const result = await getDb().collection('users').insertMany([
-      {
-        username: 'johndoe',
-        email: 'john@reelecho.com',
-        password: 'hashed_password_123',
-        fullName: 'John Doe',
-        bio: 'Movie enthusiast and content creator',
-        profilePicture: 'https://example.com/avatar1.jpg',
-        preferences: {
-          favoriteGenres: ['Action', 'Sci-Fi'],
-          notifications: true,
-          privacy: 'public'
-        },
-        createdAt: '2025-01-15T10:30:00Z',
-        updatedAt: '2025-11-20T14:20:00Z'
-      },
-      {
-        username: 'maryjane',
-        email: 'mary@reelecho.com',
-        password: 'hashed_password_456',
-        fullName: 'Mary Jane',
-        bio: 'Film critic and reviewer',
-        profilePicture: 'https://example.com/avatar2.jpg',
-        preferences: {
-          favoriteGenres: ['Drama', 'Romance'],
-          notifications: true,
-          privacy: 'friends'
-        },
-        createdAt: '2025-02-20T09:15:00Z',
-        updatedAt: '2025-11-18T16:45:00Z'
+  await User.deleteMany({})
+  const users = await User.create([
+    {
+      username: 'johndoe',
+      email: 'john@reelecho.com',
+      password: 'hashed_password_123',
+      fullName: 'John Doe',
+      bio: 'Movie enthusiast and content creator',
+      profilePicture: 'https://example.com/avatar1.jpg',
+      preferences: {
+        favoriteGenres: ['Action', 'Sci-Fi'],
+        notifications: true,
+        privacy: 'public'
       }
-    ])
-    testUserId = result.insertedIds[0].toString()
-  } else {
-    testUserId = existingUsers[0]._id.toString()
-  }
+    },
+    {
+      username: 'maryjane',
+      email: 'mary@reelecho.com',
+      password: 'hashed_password_456',
+      fullName: 'Mary Jane',
+      bio: 'Film critic and reviewer',
+      profilePicture: 'https://example.com/avatar2.jpg',
+      preferences: {
+        favoriteGenres: ['Drama', 'Romance'],
+        notifications: true,
+        privacy: 'friends'
+      }
+    }
+  ])
+  testUserId = users[0]._id.toString()
 })
 
-describe('Users API', () => {
+describe('Users API (Mongoose)', () => {
   describe('GET /api/users', () => {
     it('should return an array of users', async () => {
       const res = await request(app).get('/api/users')
@@ -238,7 +220,6 @@ describe('Users API', () => {
 
   describe('DELETE /api/users/:id', () => {
     it('should delete a user', async () => {
-      // Create a user to delete
       const createRes = await request(app)
         .post('/api/users')
         .send({
