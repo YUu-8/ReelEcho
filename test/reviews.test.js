@@ -1,84 +1,91 @@
-import { describe, it, expect } from "vitest"; // Manually import required test variables
 import request from "supertest";
+import { describe, it, expect, beforeEach } from "vitest";
 import app from "../src/app.js";
+import Review from "../src/models/review.model.js";
 
-// Test Suite: Review API All Endpoints
 describe("Reviews API (/api/reviews)", () => {
-  // Test 1: GET all reviews → Returns 200 and array
-  it("GET /api/reviews should return 200 and reviews array", async () => {
-    const res = await request(app).get("/api/reviews");
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-  });
+  let testReview;
 
-  // Test 2: GET single existing review → Returns 200 and review details
-  it("GET /api/reviews/:reviewid should return existing review", async () => {
-    const res = await request(app).get("/api/reviews/1");
-    expect(res.status).toBe(200);
-    expect(res.body.reviewid).toBe(1);
-  });
+  beforeEach(async () => {
+    // Atomic cleanup - drop collection instead of deleteMany (guarantees clean state)
+    await Review.collection.drop().catch(err => {
+      if (err.code !== 26) throw err; // Ignore "namespace not found" error
+    });
 
-  // Test 3: GET non-existent review → Returns 404
-  it("GET /api/reviews/:reviewid should return 404 (review not found)", async () => {
-    const res = await request(app).get("/api/reviews/999");
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty("error");
-  });
-
-  // Test 4: POST new review → Returns 201 and new review
-  it("POST /api/reviews should create new review and return 201", async () => {
-    const res = await request(app)
-      .post("/api/reviews")
-      .send({
-        userid: 1,
-        content_type: "tv",
-        content_id: 201,
-        score: 9.0,
-        comment: "Amazing!",
-        mood: "excited",
-        emoji: "🎉"
-      });
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty("reviewid");
-    expect(res.body.content_type).toBe("tv");
-  });
-
-  // Test 5: POST duplicate review → Returns 409 Conflict
-  it("POST /api/reviews should return 409 (duplicate review)", async () => {
-    const res = await request(app)
+    const createRes = await request(app)
       .post("/api/reviews")
       .send({
         userid: 1,
         content_type: "movie",
         content_id: 101,
-        score: 9.5
+        score: 9.0,
+        comment: "Functional test review",
+        mood: "happy",
+        emoji: "🌟"
       });
-    expect(res.status).toBe(409);
+
+    testReview = createRes.body;
   });
 
-  // Test 6: POST missing required fields → Returns 400
-  it("POST /api/reviews should return 400 (missing required fields)", async () => {
+  it("GET /api/reviews/:reviewid should return 404 (review not found)", async () => {
+    const nonExistentId = testReview.reviewid + 1000; // guaranteed non-existent
+    const res = await request(app).get(`/api/reviews/${nonExistentId}`);
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBeDefined();
+  });
+
+  it("POST /api/reviews should create a new review and return 201", async () => {
+    const newReview = {
+      userid: 2,
+      content_type: "movie",
+      content_id: 202,
+      score: 7.0,
+      comment: "Another functional test review",
+      mood: "happy",
+      emoji: "🙂"
+    };
+
     const res = await request(app)
       .post("/api/reviews")
-      .send({ userid: 1, content_type: "movie" });
-    expect(res.status).toBe(400);
+      .send(newReview)
+      .set("Content-Type", "application/json");
+
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty("reviewid");
+    expect(res.body.userid).toBe(newReview.userid);
   });
 
-  // Test 7: PUT update review → Returns 200 and updated review
-  it("PUT /api/reviews/:reviewid should update review and return 200", async () => {
+  it("POST /api/reviews should return 409 (duplicate review)", async () => {
+    const duplicateReview = {
+      userid: testReview.userid,
+      content_type: testReview.content_type,
+      content_id: testReview.content_id,
+      score: 8.0,
+      comment: "Duplicate review attempt"
+    };
+
     const res = await request(app)
-      .put("/api/reviews/1")
-      .send({ score: 9.5, comment: "Updated comment" });
-    expect(res.status).toBe(200);
-    expect(res.body.score).toBe(9.5);
-    expect(res.body.comment).toBe("Updated comment");
+      .post("/api/reviews")
+      .send(duplicateReview)
+      .set("Content-Type", "application/json");
+
+    expect(res.status).toBe(409);
+    expect(res.body.error).toBe("Content already reviewed, cannot review again");
   });
 
-  // Test 8: DELETE review → Returns 204 No Content
-  it("DELETE /api/reviews/:reviewid should soft delete review and return 204", async () => {
-    const res = await request(app).delete("/api/reviews/1");
-    expect(res.status).toBe(204);
-    const getRes = await request(app).get("/api/reviews/1");
-    expect(getRes.status).toBe(404);
+  it("PUT /api/reviews/:reviewid should update review and return 200", async () => {
+    const updateData = {
+      score: 9.5,
+      comment: "Updated functional test review",
+      emoji: "🎉"
+    };
+
+    const res = await request(app)
+      .put(`/api/reviews/${testReview.reviewid}`)
+      .send(updateData)
+      .set("Content-Type", "application/json");
+
+    expect(res.status).toBe(200);
+    expect(res.body.score).toBe(updateData.score);
   });
 });

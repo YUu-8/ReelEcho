@@ -3,6 +3,7 @@ import request from 'supertest'
 import app from '../src/app.js'
 import { connectToMongoose, closeMongoose } from '../src/db/mongoose.js'
 import User from '../src/models/user.model.js'
+import mongoose from "mongoose";
 
 let testUserId
 
@@ -11,8 +12,8 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await closeMongoose()
-})
+  await mongoose.disconnect(); 
+});
 
 beforeEach(async () => {
   await User.deleteMany({})
