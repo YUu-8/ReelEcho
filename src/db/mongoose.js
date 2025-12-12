@@ -21,9 +21,20 @@ export async function connectToMongoose() {
     console.log("Connected to MongoDB:", mongoose.connection.db.databaseName); // Lab 7 required output
   } catch (err) {
     console.error("MongoDB Atlas connection error:", err);
-    process.exit(1); // Exit on critical error
+    // Avoid killing the test runner; rethrow in test environment
+    if (process.env.NODE_ENV === 'test') {
+      throw err
+    }
+    process.exit(1); // Exit on critical error in non-test environments
   }
 }
 
 // Export connection for testing
 export const db = mongoose.connection;
+
+// Graceful close helper (used by tests or shutdown hooks)
+export async function closeMongoose() {
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect()
+  }
+}
