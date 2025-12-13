@@ -275,4 +275,52 @@ router.delete('/:listId', (req, res) => {
   }
 });
 
+/**
+ * Update favourite list core fields (PUT /api/favourites/:listId)
+ * Request body: { list_name?, visibility? } (at least one field required)
+ * Response: 200 + updated list | 400 Bad Request | 404 Not Found | 409 Conflict (duplicate list name)
+ */
+router.put('/:listId', (req, res) => {
+  try {
+    const listId = parseInt(req.params.listId);
+    const { list_name, visibility } = req.body;
+
+    if (isNaN(listId)) {
+      return res.status(400).json({ error: "List ID must be a number" });
+    }
+
+    if (!list_name && !visibility) {
+      return res.status(400).json({ error: "Must provide at least one field to update (list_name/visibility)" });
+    }
+
+    if (visibility && !["public", "private"].includes(visibility)) {
+      return res.status(400).json({ error: "visibility must be either 'public' or 'private'" });
+    }
+
+    const targetList = favouriteLists.find(
+      list => !list.isDeleted && list.id === listId
+    );
+    if (!targetList) {
+      return res.status(404).json({ error: "Favourite list does not exist or has been deleted" });
+    }
+
+    if (list_name) {
+      const isDuplicate = favouriteLists.some(
+        list => !list.isDeleted && list.userid === targetList.userid && list.list_name === list_name
+      );
+      if (isDuplicate) {
+        return res.status(409).json({ error: "This user already has a favourite list with the same name" });
+      }
+    }
+
+    if (list_name) targetList.list_name = list_name;
+    if (visibility) targetList.visibility = visibility;
+    targetList.updatedAt = new Date().toISOString();
+
+    res.status(200).json(targetList);
+  } catch (err) {
+    res.status(500).json({ error: "Server error: Failed to update favourite list" });
+  }
+});
+
 export default router;
