@@ -26,6 +26,8 @@ await connectToMongoose()
 
 // Simple root + health endpoints
 app.get('/', (_req, res) => res.json({ ok: true, message: 'Hello from CI/CD demo 👋' }))
+// Add /api alias for frontend fetches (Lab 8 proxy)
+app.get('/api', (_req, res) => res.json({ ok: true, message: 'Hello from CI/CD demo 👋' }))
 app.get('/health', (_req, res) => res.status(200).send('OK'))
 
 // Auto-mount all routers placed under src/routes/auto

@@ -1,14 +1,12 @@
-# DevOps Lab – Student Project (Node.js + Jira/GitHub + CI/CD)
+# ReelEcho – MERN Lab Project (DevOps-friendly)
 
-This repository is a **teaching template** for a 4-student DevOps mini-project.
-It demonstrates a realistic workflow: **PLAN (Jira) → CODE (Git/VS Code) → BUILD/TEST (GitHub Actions) → REVIEW (PRs) → DEPLOY (optional)**.
+ReelEcho is a lightweight MERN practice app where students collaborate on a small media platform: manage users, post reviews, and curate favourites. The stack is set up for DevOps habits from day one (tests, coverage gates, CI-ready scripts).
 
-> **What you get here**
-> - Minimal **Express** API with auto-mounted routes
-> - **Vitest + Supertest** for integration & unit tests
-> - Coverage thresholds enforced in CI
-> - **GitHub Actions** workflow for lint + tests + coverage artifact
-> - Clear file layout for a team of 4
+**Highlights**
+- Node/Express + Mongoose backend, auto-mounted routes for low merge friction.
+- React + Vite frontend with a dark, minimal shell and feature placeholders (users, favourites, posts, reviews).
+- Vitest + Supertest integration/unit tests with coverage thresholds enforced.
+- Ready for CI (GitHub Actions) and branching conventions that play well with Jira/GitHub.
 
 ---
 
@@ -22,15 +20,25 @@ npm test -- --coverage
 
 Open `coverage/index.html` for a visual coverage report (locally).
 
+Frontend (Vite):
+
+```bash
+cd frontend
+npm install
+npm run dev          # http://localhost:5173 (or next port)
+```
+
 ---
 
 ## Routes
 
 - `GET /` – basic JSON greeting
+- `GET /api` – same greeting used by the frontend proxy
 - `GET /health` – health check (200 OK)
 - `GET /version` – returns `{ version }` from `package.json`
 - `GET /info` – returns `{ name, version, node, uptime }`
 - `GET /boom` – triggers an error to test the global error handler
+- `GET /api/users` etc. – user CRUD via Mongoose (see `src/routes/auto/users.route.js`)
 
 Routes are **auto-mounted** from `src/routes/auto/*.route.js` so each student can add a file without touching `src/app.js` (fewer merge conflicts).
 
@@ -81,6 +89,7 @@ src/
   index.js        # server entry (not used by tests)
   routes/auto/    # students add *.route.js files here
   utils/          # small testable helpers
+frontend/         # Vite React app (users/favourites/posts/reviews placeholders)
 test/
   *.test.js       # integration (HTTP) tests
   unit/*.test.js  # pure unit tests
