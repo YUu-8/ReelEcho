@@ -18,6 +18,6 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true, collection: "Reviews" }
 );
 
-reviewSchema.index({ userid: 1, content_type: 1, content_id: 1 }, { unique: true });
+// reviewSchema.index({ userid: 1, content_type: 1, content_id: 1 }, { unique: true });
 
 export default mongoose.model("Review", reviewSchema);

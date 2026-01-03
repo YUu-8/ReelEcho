@@ -4,14 +4,14 @@ import Review from "../models/review.model.js";
  * Get all reviews
  * Returns an array of all review documents (200)
  */
-export async function getAllReviews(_req, res, next) {
+export const getAllReviews = async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ reviewid: 1 }).lean();
-    return res.status(200).json(reviews);
+    const reviews = await Review.find();
+    res.status(200).json(reviews);
   } catch (err) {
-    next(err);
+    res.status(500).json({ message: err.message });
   }
-}
+};
 
 /**
  * Create new review (Lab 7 Section 4: MVC Controller Requirement)

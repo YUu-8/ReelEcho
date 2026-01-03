@@ -5,6 +5,7 @@ import UsersPage from './pages/UsersPage.jsx'
 import FavouritesPage from './pages/FavouritesPage.jsx'
 import PostsPage from './pages/PostsPage.jsx'
 import ReviewsPage from './pages/ReviewsPage.jsx'
+import MovieDetail from './pages/MovieDetail.jsx';
 
 function App () {
   const [message, setMessage] = useState('')
@@ -38,6 +39,7 @@ function App () {
           <Route path="/favourites" element={<FavouritesPage />} />
           <Route path="/posts" element={<PostsPage />} />
           <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/movies/:id" element={<MovieDetail />} />
         </Routes>
       </main>
     </BrowserRouter>
