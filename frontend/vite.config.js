@@ -1,4 +1,4 @@
-// frontend/vite.config.js 完整代码（直接替换）
+// frontend/vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -10,7 +10,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true, 
-        rewrite: (path) => path.replace(/^\/api/, '') 
+        //rewrite: (path) => path.replace(/^\/api/, '') 
       }
     }
   }

@@ -6,7 +6,7 @@ const ReviewsPage = () => {
   const [refresh, setRefresh] = useState(false);
 
   const handleSubmit = () => {
-    setRefresh(!refresh); // 触发列表重新加载
+    setRefresh(!refresh);
   };
 
   return (
