@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import Header from './components/Header.jsx'
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import UsersPage from './pages/UsersPage.jsx'
 import FavouritesPage from './pages/FavouritesPage.jsx'
 import PostsPage from './pages/PostsPage.jsx'
@@ -23,7 +22,6 @@ function App () {
         <div className="topbar__inner">
           <div className="brand">ReelEcho</div>
           <nav className="menu">
-            <Link to="/">Home</Link>
             <Link to="/users">Users</Link>
             <Link to="/favourites">Favourites</Link>
             <Link to="/posts">Posts</Link>
@@ -34,7 +32,7 @@ function App () {
 
       <main className="page">
         <Routes>
-          <Route path="/" element={<Header />} />
+          <Route path="/" element={<Navigate to="/reviews" replace />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/favourites" element={<FavouritesPage />} />
           <Route path="/posts" element={<PostsPage />} />
