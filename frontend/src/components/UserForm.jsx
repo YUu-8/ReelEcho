@@ -6,6 +6,7 @@ export default function UserForm ({ onCreated }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [bio, setBio] = useState('')
   const [error, setError] = useState('')
 
   async function handleSubmit (e) {
@@ -15,7 +16,7 @@ export default function UserForm ({ onCreated }) {
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, fullName })
+        body: JSON.stringify({ username, email, password, fullName, bio })
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -25,6 +26,7 @@ export default function UserForm ({ onCreated }) {
       setEmail('')
       setPassword('')
       setFullName('')
+      setBio('')
       onCreated()
     } catch (err) {
       setError(err.message)
@@ -65,6 +67,14 @@ export default function UserForm ({ onCreated }) {
           onChange={e => setFullName(e.target.value)}
           placeholder="Full name"
           required
+        />
+      </div>
+      <div>
+        <textarea
+          value={bio}
+          onChange={e => setBio(e.target.value)}
+          placeholder="Bio (optional)"
+          rows="3"
         />
       </div>
       <button className="cta" type="submit">Add user</button>

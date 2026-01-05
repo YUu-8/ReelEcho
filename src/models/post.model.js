@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema(
     // Numeric id (like other modules such as reviewid)
     id: { type: Number, required: true, unique: true, index: true },
 
-    userid: { type: Number, required: true, index: true },
+    userid: { type: mongoose.Schema.Types.Mixed, required: true, index: true },
     reviewid: { type: Number, required: true, index: true },
 
     content: { type: String, required: true, trim: true },

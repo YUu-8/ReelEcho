@@ -12,7 +12,7 @@ export function validateCreatePostBody(body) {
     return "Missing required fields (userid, content, reviewid)";
   }
 
-  if (!Number.isInteger(Number(userid))) return "userid must be an integer";
+  if (typeof userid !== "number" && typeof userid !== "string") return "userid must be a number or string";
   if (!Number.isInteger(Number(reviewid))) return "reviewid must be an integer";
 
   if (typeof content !== "string" || content.trim().length === 0) {

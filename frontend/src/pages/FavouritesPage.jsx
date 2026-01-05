@@ -44,6 +44,7 @@ export default function FavouritesPage() {
   // user
   const [userInput, setUserInput] = useState(localStorage.getItem("userid_input") || "");
   const [userId, setUserId] = useState(localStorage.getItem("userid") || "");
+  const [users, setUsers] = useState([]);
 
   // lists
   const [lists, setLists] = useState([]);
@@ -55,6 +56,7 @@ export default function FavouritesPage() {
 
   // tvmaze search
   const [showQuery, setShowQuery] = useState("");
+  const [contentTypeFilter, setContentTypeFilter] = useState("all");
   const [searching, setSearching] = useState(false);
   const [searchErr, setSearchErr] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -76,14 +78,13 @@ export default function FavouritesPage() {
   async function confirmUser() {
     setErrMsg("");
     try {
-      if (!userInput.trim()) throw new Error("Please enter username or email.");
-      const realUserId = await resolveUserId(userInput.trim());
+      if (!userInput) throw new Error("Please select a user.");
+      
+      setUserId(userInput);
+      localStorage.setItem("userid", userInput);
+      localStorage.setItem("userid_input", userInput);
 
-      setUserId(realUserId);
-      localStorage.setItem("userid", realUserId);
-      localStorage.setItem("userid_input", userInput.trim());
-
-      await loadLists(realUserId);
+      await loadLists(userInput);
     } catch (e) {
       setUserId("");
       setLists([]);
@@ -287,6 +288,24 @@ export default function FavouritesPage() {
 
   /* ---------------------- initial load ---------------------- */
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const data = await request("/api/users");
+        setUsers(data || []);
+        if (data && data.length > 0 && !userId) {
+          const savedUserId = localStorage.getItem("userid");
+          if (savedUserId) {
+            setUserInput(savedUserId);
+          } else {
+            setUserInput(data[0]._id);
+          }
+        }
+      } catch (e) {
+        console.log("Failed to load users:", e.message);
+      }
+    };
+    
+    fetchUsers();
     if (userId) loadLists(userId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -303,19 +322,34 @@ export default function FavouritesPage() {
   });
 
   return (
-    <div style={{ maxWidth: 1200, margin: "40px auto", padding: "0 16px" }}>
-      <h1 style={{ marginBottom: 16 }}>Favourites (TVMaze)</h1>
+    <div className="users-page panel" style={{ maxWidth: 1200, margin: "40px auto" }}>
+      <h2 style={{ marginBottom: 16 }}>Favourites</h2>
 
       {/* user confirm */}
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
-        <input
+        <select
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-          placeholder="Enter username or email"
-          style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid #333" }}
-        />
-        <button onClick={confirmUser}>Confirm</button>
-        <button onClick={() => loadLists(userId)} disabled={loadingLists || !userId}>
+          style={{
+            flex: 1,
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '10px',
+            padding: '10px 12px',
+            color: '#e5e7eb',
+            fontFamily: 'inherit',
+            cursor: 'pointer'
+          }}
+        >
+          {users.length === 0 && <option value="" style={{ background: '#1e293b', color: '#e5e7eb' }}>Loading users...</option>}
+          {users.map(user => (
+            <option key={user._id} value={user._id} style={{ background: '#1e293b', color: '#e5e7eb' }}>
+              {user.username} ({user.email})
+            </option>
+          ))}
+        </select>
+        <button className="cta" onClick={confirmUser}>Confirm</button>
+        <button className="cta secondary" onClick={() => loadLists(userId)} disabled={loadingLists || !userId}>
           {loadingLists ? "Loading..." : "Refresh"}
         </button>
       </div>
@@ -323,26 +357,37 @@ export default function FavouritesPage() {
       {errMsg ? <div style={{ color: "crimson", marginBottom: 16 }}>Error: {errMsg}</div> : null}
 
       {/* create list */}
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20 }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "stretch", marginBottom: 20 }}>
         <input
           value={newListName}
           onChange={(e) => setNewListName(e.target.value)}
           placeholder="New list name..."
-          style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid #333" }}
+          style={{ flex: 1 }}
         />
 
-        <select
-          value={visibility}
-          onChange={(e) => setVisibility(e.target.value)}
-          style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid #333" }}
-        >
-          <option value="private">private</option>
-          <option value="public">public</option>
-        </select>
+        <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '10px',
+              padding: '10px 12px',
+              color: '#e5e7eb',
+              fontFamily: 'inherit',
+              cursor: 'pointer',
+              minWidth: '120px'
+            }}
+          >
+            <option value="private" style={{ background: '#1e293b', color: '#e5e7eb' }}>Private</option>
+            <option value="public" style={{ background: '#1e293b', color: '#e5e7eb' }}>Public</option>
+          </select>
 
-        <button onClick={createList} disabled={!userId}>
-          Create
-        </button>
+          <button className="cta" onClick={createList} disabled={!userId}>
+            Create
+          </button>
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16 }}>
@@ -405,13 +450,11 @@ export default function FavouritesPage() {
         </div>
 
         {/* right detail */}
+        {selected && (
         <div>
           <h2 style={{ marginBottom: 12 }}>List Detail</h2>
 
-          {!selected ? (
-            <div style={{ opacity: 0.8 }}>Select a list to view items.</div>
-          ) : (
-            <div style={{ border: "1px solid #333", borderRadius: 14, padding: 14 }}>
+          <div style={{ border: "1px solid #333", borderRadius: 14, padding: 14 }}>
               <div style={{ fontWeight: 950, marginBottom: 6 }}>
                 {selected.list_name || selected.name || selected.title || "List"}
               </div>
@@ -421,17 +464,38 @@ export default function FavouritesPage() {
 
               {/* search + add (optimization #1) */}
               <div style={{ marginTop: 10, marginBottom: 14, border: "1px solid #333", borderRadius: 14, padding: 12 }}>
-                <div style={{ fontWeight: 900, marginBottom: 8 }}>Search shows by name</div>
+                <div style={{ fontWeight: 900, marginBottom: 8 }}>Search movies & TV shows</div>
+
+                <div style={{ marginBottom: 10 }}>
+                  <select
+                    value={contentTypeFilter}
+                    onChange={(e) => setContentTypeFilter(e.target.value)}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid #333',
+                      borderRadius: '10px',
+                      padding: '10px 12px',
+                      color: '#e5e7eb',
+                      fontFamily: 'inherit',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      width: '100%'
+                    }}
+                  >
+                    <option value="all" style={{ background: '#1e293b', color: '#e5e7eb' }}>All (Movies & TV Shows)</option>
+                    <option value="movie" style={{ background: '#1e293b', color: '#e5e7eb' }}>Movies Only</option>
+                    <option value="tv" style={{ background: '#1e293b', color: '#e5e7eb' }}>TV Shows Only</option>
+                  </select>
+                </div>
 
                 <div style={{ display: "flex", gap: 10 }}>
                   <input
                     value={showQuery}
                     onChange={(e) => setShowQuery(e.target.value)}
                     onKeyDown={onSearchKeyDown}
-                    placeholder="Type a show name (press Enter)"
-                    style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid #333" }}
+                    placeholder="Type a title (press Enter)"
                   />
-                  <button onClick={searchShows} disabled={searching || !showQuery.trim()}>
+                  <button className="cta" onClick={searchShows} disabled={searching || !showQuery.trim()}>
                     {searching ? "Searching..." : "Search"}
                   </button>
                 </div>
@@ -440,7 +504,14 @@ export default function FavouritesPage() {
 
                 {searchResults.length > 0 ? (
                   <ul style={{ listStyle: "none", padding: 0, marginTop: 12, display: "grid", gap: 10 }}>
-                    {searchResults.slice(0, 10).map((s) => {
+                    {searchResults
+                      .filter(s => {
+                        if (contentTypeFilter === 'all') return true;
+                        if (contentTypeFilter === 'movie') return s.type === 'Movie';
+                        if (contentTypeFilter === 'tv') return s.type === 'TV Show';
+                        return true;
+                      })
+                      .slice(0, 10).map((s) => {
                       const full = stripHtml(s.summary);
                       const isOpen = !!previewOpen[s.id];
                       const short = full.slice(0, 160);
@@ -466,8 +537,8 @@ export default function FavouritesPage() {
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontWeight: 950 }}>
                               {s.name}{" "}
-                              <span style={{ opacity: 0.8, fontWeight: 700 }}>
-                                {s.premiered ? `(${String(s.premiered).slice(0, 4)})` : ""}
+                              <span style={{ opacity: 0.6, fontWeight: 600, fontSize: 13 }}>
+                                {s.type ? `[${s.type}]` : ""}
                               </span>
                             </div>
 
@@ -510,12 +581,20 @@ export default function FavouritesPage() {
                   <select
                     value={sortMode}
                     onChange={(e) => setSortMode(e.target.value)}
-                    style={{ padding: "8px 10px", borderRadius: 10, border: "1px solid #333" }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '10px',
+                      padding: '8px 10px',
+                      color: '#e5e7eb',
+                      fontFamily: 'inherit',
+                      cursor: 'pointer'
+                    }}
                   >
-                    <option value="added-newest">Added (newest)</option>
-                    <option value="added-oldest">Added (oldest)</option>
-                    <option value="name-asc">Name (A → Z)</option>
-                    <option value="name-desc">Name (Z → A)</option>
+                    <option value="added-newest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Added (newest)</option>
+                    <option value="added-oldest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Added (oldest)</option>
+                    <option value="name-asc" style={{ background: '#1e293b', color: '#e5e7eb' }}>Name (A → Z)</option>
+                    <option value="name-desc" style={{ background: '#1e293b', color: '#e5e7eb' }}>Name (Z → A)</option>
                   </select>
                 </div>
               </div>
@@ -565,8 +644,8 @@ export default function FavouritesPage() {
                 <div style={{ opacity: 0.8 }}>No items in this list.</div>
               )}
             </div>
-          )}
         </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,12 @@
 /**
  * Users API Routes
  * Handles user registration, authentication, profile management
+ * 
+ * TODO: SECURITY - Add authentication middleware for:
+ * - GET /api/users (list all users) - should be admin-only or restricted
+ * - PUT /api/users/:id (update profile) - should require user ownership or admin role
+ * - DELETE /api/users/:id (delete user) - should be admin-only
+ * Currently all endpoints are public and unprotected!
  */
 import express from 'express'
 import {

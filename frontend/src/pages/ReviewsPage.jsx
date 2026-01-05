@@ -10,10 +10,10 @@ const ReviewsPage = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Reviews</h1>
+    <div className="users-page panel">
+      <h2>Reviews</h2>
       <ReviewForm onSubmitSuccess={handleSubmit} />
-      <ReviewList />
+      <ReviewList key={refresh} />
     </div>
   );
 };

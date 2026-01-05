@@ -49,7 +49,7 @@ export async function createPost(req, res, next) {
 
     const created = await Post.create({
       id: nextId,
-      userid: Number(userid),
+      userid: userid,
       content: String(content).trim(),
       reviewid: Number(reviewid),
       post_date: new Date(), // auto-generated

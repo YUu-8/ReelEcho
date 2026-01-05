@@ -11,10 +11,10 @@ const MovieDetail = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1>Movie Detail (ID: 100)</h1>
+    <div className="users-page panel">
+      <h2>Movie Detail (ID: 100)</h2>
       <ReviewForm onSubmitSuccess={handleReviewSubmit} />
-      <ReviewList refreshTrigger={refreshReviews} />
+      <ReviewList />
     </div>
   );
 };
