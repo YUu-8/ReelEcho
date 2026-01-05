@@ -1,4 +1,4 @@
-# ReelEcho – MERN Lab Project (DevOps-friendly)
+# ReelEcho
 
 ReelEcho is a lightweight MERN practice app where students collaborate on a small media platform: manage users, post reviews, and curate favourites. The stack is set up for DevOps habits from day one (tests, coverage gates, CI-ready scripts).
 
