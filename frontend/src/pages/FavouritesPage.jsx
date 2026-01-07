@@ -371,7 +371,7 @@ export default function FavouritesPage() {
   return (
     <div style={pageStyle}>
       <div style={containerStyle}>
-        <h1 style={{ fontSize: 44, fontWeight: 900, margin: "0 0 16px" }}>Favourites (TVMaze)</h1>
+        <h1 style={{ fontSize: 44, fontWeight: 900, margin: "0 0 16px" }}>Favourites</h1>
 
         {/* user row */}
         <div style={{ ...panelStyle, marginBottom: 14 }}>
