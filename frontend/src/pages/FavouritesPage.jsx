@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 
-/* ---------------------- helpers ---------------------- */
 async function request(path, options) {
   const res = await fetch(path, {
     headers: { "Content-Type": "application/json", ...(options?.headers || {}) },
@@ -39,12 +38,10 @@ async function resolveUserId(input) {
   return found._id;
 }
 
-/* ---------------------- page ---------------------- */
 export default function FavouritesPage() {
   // user
   const [userInput, setUserInput] = useState(localStorage.getItem("userid_input") || "");
   const [userId, setUserId] = useState(localStorage.getItem("userid") || "");
-  const [users, setUsers] = useState([]);
 
   // lists
   const [lists, setLists] = useState([]);
@@ -54,19 +51,19 @@ export default function FavouritesPage() {
   const [newListName, setNewListName] = useState("");
   const [visibility, setVisibility] = useState("private");
 
-  // tvmaze search
+  // manual search add
   const [showQuery, setShowQuery] = useState("");
-  const [contentTypeFilter, setContentTypeFilter] = useState("all");
   const [searching, setSearching] = useState(false);
   const [searchErr, setSearchErr] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [previewOpen, setPreviewOpen] = useState({}); // { [showid]: boolean }
 
-  // show detail cache (for selected items)
-  const [showCache, setShowCache] = useState({}); // { [showid]: show }
+  // recommended (default search)
+  const RECOMMENDED_QUERIES = useMemo(() => ["friends", "office", "breaking", "game", "girls", "sherlock"], []);
+  const [recommended, setRecommended] = useState([]);
+  const [loadingRec, setLoadingRec] = useState(false);
 
-  // sorting
-  const [sortMode, setSortMode] = useState("added-newest");
+  // cache show details for selected items
+  const [showCache, setShowCache] = useState({});
 
   // ui
   const [loadingLists, setLoadingLists] = useState(false);
@@ -74,41 +71,140 @@ export default function FavouritesPage() {
 
   const selectedId = useMemo(() => (selected?._id || selected?.id || null), [selected]);
 
-  /* ---------------------- user actions ---------------------- */
+  /* ---------- styles ---------- */
+  const pageStyle = {
+    minHeight: "100vh",
+    background:
+      "radial-gradient(1200px 700px at 30% -10%, rgba(56,189,248,0.25), transparent 55%), linear-gradient(180deg, #081225 0%, #040810 100%)",
+    color: "rgba(255,255,255,0.92)",
+    padding: "28px 0",
+  };
+  const containerStyle = { maxWidth: 1280, margin: "0 auto", padding: "0 18px" };
+
+  const panelStyle = {
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    borderRadius: 18,
+    padding: 14,
+    backdropFilter: "blur(10px)",
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 14,
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.04)",
+    color: "rgba(255,255,255,0.92)",
+    outline: "none",
+  };
+
+  const buttonStyle = {
+    padding: "10px 16px",
+    borderRadius: 999,
+    border: "1px solid rgba(56,189,248,0.35)",
+    background: "rgba(56,189,248,0.18)",
+    color: "rgba(255,255,255,0.95)",
+    fontWeight: 800,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+  };
+
+  const buttonGhostStyle = {
+    padding: "10px 14px",
+    borderRadius: 999,
+    border: "1px solid rgba(255,255,255,0.14)",
+    background: "rgba(255,255,255,0.05)",
+    color: "rgba(255,255,255,0.9)",
+    fontWeight: 750,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+  };
+
+  const buttonDangerStyle = {
+    padding: "10px 14px",
+    borderRadius: 999,
+    border: "1px solid rgba(255,99,132,0.35)",
+    background: "rgba(255,99,132,0.12)",
+    color: "rgba(255,220,230,0.95)",
+    fontWeight: 850,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+  };
+
+  const listCardStyle = (active) => ({
+    background: active ? "rgba(56,189,248,0.10)" : "rgba(255,255,255,0.04)",
+    border: active ? "1px solid rgba(56,189,248,0.35)" : "1px solid rgba(255,255,255,0.10)",
+    borderRadius: 16,
+    padding: 14,
+    cursor: "pointer",
+  });
+
+  const rowStyle = {
+    border: "1px solid rgba(255,255,255,0.10)",
+    borderRadius: 16,
+    padding: 12,
+    background: "rgba(255,255,255,0.04)",
+    display: "flex",
+    gap: 12,
+    alignItems: "center",
+  };
+
+  const posterStyle = {
+    width: 60,
+    height: 90,
+    borderRadius: 12,
+    objectFit: "cover",
+    background: "rgba(255,255,255,0.06)",
+    flexShrink: 0,
+  };
+
+  const recCardStyle = {
+    minWidth: 200,
+    maxWidth: 200,
+    border: "1px solid rgba(255,255,255,0.10)",
+    borderRadius: 16,
+    background: "rgba(255,255,255,0.04)",
+    padding: 12,
+    display: "flex",
+    gap: 12,
+    alignItems: "center",
+  };
+
+  /* ---------- actions ---------- */
   async function confirmUser() {
     setErrMsg("");
     try {
-      if (!userInput) throw new Error("Please select a user.");
-      
-      setUserId(userInput);
-      localStorage.setItem("userid", userInput);
-      localStorage.setItem("userid_input", userInput);
+      const input = userInput.trim();
+      if (!input) throw new Error("Please enter username or email.");
+      const realUserId = await resolveUserId(input);
 
-      await loadLists(userInput);
+      setUserId(realUserId);
+      localStorage.setItem("userid", realUserId);
+      localStorage.setItem("userid_input", input);
+
+      await loadLists(realUserId, { keepSelected: false });
     } catch (e) {
+      setErrMsg(e.message || "Failed to confirm user");
       setUserId("");
       setLists([]);
       setSelected(null);
-      setErrMsg(e.message || "Failed to confirm user");
     }
   }
 
-  /* ---------------------- lists ---------------------- */
-  async function loadLists(uid = userId) {
+  async function loadLists(uid = userId, opts = { keepSelected: true }) {
     if (!uid) return;
     setLoadingLists(true);
     setErrMsg("");
     try {
       const data = await request(`/api/favourites?userid=${encodeURIComponent(uid)}`);
       setLists(Array.isArray(data) ? data : []);
-      setSelected(null);
+      if (!opts.keepSelected) setSelected(null);
     } catch (e) {
       if (e.status === 404) {
         setLists([]);
-        setSelected(null);
+        if (!opts.keepSelected) setSelected(null);
       } else {
-        setLists([]);
-        setSelected(null);
         setErrMsg(e.message || "Failed to load favourites");
       }
     } finally {
@@ -121,17 +217,15 @@ export default function FavouritesPage() {
     try {
       const data = await request(`/api/favourites/${listId}`);
       setSelected(data);
-      setSortMode("added-newest");
     } catch (e) {
-      setSelected(null);
-      setErrMsg(e.message || "Failed to load list detail");
+      setErrMsg(e.message || "Failed to load list");
     }
   }
 
   async function createList() {
     setErrMsg("");
     try {
-      if (!userId) throw new Error("Please confirm user first.");
+      if (!userId) throw new Error("Confirm user first.");
       if (!newListName.trim()) throw new Error("List name is required.");
 
       await request("/api/favourites", {
@@ -144,7 +238,7 @@ export default function FavouritesPage() {
       });
 
       setNewListName("");
-      await loadLists(userId);
+      await loadLists(userId, { keepSelected: true });
     } catch (e) {
       setErrMsg(e.message || "Failed to create list");
     }
@@ -155,13 +249,44 @@ export default function FavouritesPage() {
     try {
       await request(`/api/favourites/${listId}`, { method: "DELETE" });
       if (selectedId === listId) setSelected(null);
-      await loadLists(userId);
+      await loadLists(userId, { keepSelected: true });
     } catch (e) {
       setErrMsg(e.message || "Failed to delete list");
     }
   }
 
-  /* ---------------------- tvmaze search ---------------------- */
+  async function addShowToSelected(showid) {
+    setErrMsg("");
+    try {
+      if (!selectedId) throw new Error("Open a list first.");
+      await request(`/api/favourites/${selectedId}/items`, {
+        method: "POST",
+        body: JSON.stringify({ showid: String(showid) }),
+      });
+
+      await openList(selectedId);
+      await loadLists(userId, { keepSelected: true });
+    } catch (e) {
+      setErrMsg(e.message || "Failed to add show");
+    }
+  }
+
+  async function removeShowFromSelected(showid) {
+    setErrMsg("");
+    try {
+      if (!selectedId) return;
+      await request(`/api/favourites/${selectedId}/items`, {
+        method: "DELETE",
+        body: JSON.stringify({ showid: String(showid) }),
+      });
+
+      await openList(selectedId);
+      await loadLists(userId, { keepSelected: true });
+    } catch (e) {
+      setErrMsg(e.message || "Failed to remove show");
+    }
+  }
+
   async function searchShows() {
     setSearchErr("");
     setSearching(true);
@@ -169,16 +294,15 @@ export default function FavouritesPage() {
       const q = showQuery.trim();
       if (!q) {
         setSearchResults([]);
-        setSearchErr("Type a name to search.");
+        setSearchErr("Type a show name.");
         return;
       }
       const data = await request(`/api/shows?query=${encodeURIComponent(q)}`);
-      const arr = Array.isArray(data) ? data : [];
-      setSearchResults(arr);
-      if (arr.length === 0) setSearchErr("No results.");
+      setSearchResults(Array.isArray(data) ? data : []);
+      if (!data?.length) setSearchErr("No results.");
     } catch (e) {
-      setSearchResults([]);
       setSearchErr(e.message || "Search failed");
+      setSearchResults([]);
     } finally {
       setSearching(false);
     }
@@ -188,45 +312,30 @@ export default function FavouritesPage() {
     if (e.key === "Enter") searchShows();
   }
 
-  function togglePreview(id) {
-    setPreviewOpen((prev) => ({ ...prev, [id]: !prev[id] }));
-  }
+  /* ---------- default recommended search ---------- */
+  useEffect(() => {
+    (async () => {
+      setLoadingRec(true);
+      try {
+        const batches = await Promise.all(
+          RECOMMENDED_QUERIES.map((q) =>
+            request(`/api/shows?query=${encodeURIComponent(q)}`).catch(() => [])
+          )
+        );
 
-  /* ---------------------- favourites items ---------------------- */
-  async function addShowId(showId) {
-    setErrMsg("");
-    try {
-      if (!selectedId) throw new Error("Open a list first.");
-      await request(`/api/favourites/${selectedId}/items`, {
-        method: "POST",
-        body: JSON.stringify({ showid: String(showId) }),
-      });
+        const flat = batches.flatMap((arr) => (Array.isArray(arr) ? arr.slice(0, 2) : []));
+        const map = new Map();
+        for (const s of flat) {
+          if (s?.id != null && !map.has(String(s.id))) map.set(String(s.id), s);
+        }
+        setRecommended(Array.from(map.values()).slice(0, 12));
+      } finally {
+        setLoadingRec(false);
+      }
+    })();
+  }, [RECOMMENDED_QUERIES]);
 
-      // refresh selected list + list counts
-      await openList(selectedId);
-      await loadLists(userId);
-    } catch (e) {
-      setErrMsg(e.message || "Failed to add show");
-    }
-  }
-
-  async function removeShowId(item) {
-    setErrMsg("");
-    try {
-      if (!selectedId) return;
-      await request(`/api/favourites/${selectedId}/items`, {
-        method: "DELETE",
-        body: JSON.stringify({ showid: item.showid }),
-      });
-
-      await openList(selectedId);
-      await loadLists(userId);
-    } catch (e) {
-      setErrMsg(e.message || "Failed to remove show");
-    }
-  }
-
-  /* ---------------------- cache show details for items ---------------------- */
+  /* ---------- cache items detail ---------- */
   useEffect(() => {
     if (!selected?.items?.length) return;
 
@@ -238,414 +347,300 @@ export default function FavouritesPage() {
     if (missing.length === 0) return;
 
     (async () => {
-      try {
-        const results = await Promise.all(
-          missing.map((id) =>
-            fetch(`/api/shows/${encodeURIComponent(id)}`)
-              .then((r) => (r.ok ? r.json() : null))
-              .catch(() => null)
-          )
-        );
-
-        const next = {};
-        results.forEach((s, i) => {
-          if (s) next[missing[i]] = s;
-        });
-
-        if (Object.keys(next).length > 0) {
-          setShowCache((prev) => ({ ...prev, ...next }));
-        }
-      } catch {
-        // ignore
-      }
+      const results = await Promise.all(
+        missing.map((id) =>
+          fetch(`/api/shows/${encodeURIComponent(id)}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null)
+        )
+      );
+      const next = {};
+      results.forEach((s, i) => {
+        if (s) next[missing[i]] = s;
+      });
+      if (Object.keys(next).length) setShowCache((prev) => ({ ...prev, ...next }));
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
+  }, [selected, showCache]);
 
-  /* ---------------------- sorted items (optimization #2) ---------------------- */
-  const sortedItems = useMemo(() => {
-    const items = Array.isArray(selected?.items) ? [...selected.items] : [];
-    if (items.length === 0) return items;
-
-
-    if (sortMode === "added-newest") return items.reverse();
-    if (sortMode === "added-oldest") return items;
-
-    const getName = (it) => {
-      const sid = it?.showid != null ? String(it.showid) : "";
-      return (showCache[sid]?.name || "").toLowerCase();
-    };
-
-    if (sortMode === "name-asc") {
-      return items.sort((a, b) => getName(a).localeCompare(getName(b)));
-    }
-    if (sortMode === "name-desc") {
-      return items.sort((a, b) => getName(b).localeCompare(getName(a)));
-    }
-
-    return items;
-  }, [selected, showCache, sortMode]);
-
-  /* ---------------------- initial load ---------------------- */
+  /* ---------- initial load ---------- */
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await request("/api/users");
-        setUsers(data || []);
-        if (data && data.length > 0 && !userId) {
-          const savedUserId = localStorage.getItem("userid");
-          if (savedUserId) {
-            setUserInput(savedUserId);
-          } else {
-            setUserInput(data[0]._id);
-          }
-        }
-      } catch (e) {
-        console.log("Failed to load users:", e.message);
-      }
-    };
-    
-    fetchUsers();
-    if (userId) loadLists(userId);
+    if (userId) loadLists(userId, { keepSelected: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ---------------------- styles ---------------------- */
-  const cardStyle = (active) => ({
-    border: "1px solid #333",
-    borderRadius: 14,
-    padding: 14,
-    cursor: "pointer",
-    background: active ? "rgba(0, 160, 255, 0.10)" : "rgba(255, 255, 255, 0.03)",
-    boxShadow: active ? "0 0 0 1px rgba(0,160,255,0.35) inset" : "none",
-    transition: "transform 0.08s ease, background 0.15s ease",
-  });
-
   return (
-    <div className="users-page panel" style={{ maxWidth: 1200, margin: "40px auto" }}>
-      <h2 style={{ marginBottom: 16 }}>Favourites</h2>
+    <div style={pageStyle}>
+      <div style={containerStyle}>
+        <h1 style={{ fontSize: 44, fontWeight: 900, margin: "0 0 16px" }}>Favourites (TVMaze)</h1>
 
-      {/* user confirm */}
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16 }}>
-        <select
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          style={{
-            flex: 1,
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '10px',
-            padding: '10px 12px',
-            color: '#e5e7eb',
-            fontFamily: 'inherit',
-            cursor: 'pointer'
-          }}
-        >
-          {users.length === 0 && <option value="" style={{ background: '#1e293b', color: '#e5e7eb' }}>Loading users...</option>}
-          {users.map(user => (
-            <option key={user._id} value={user._id} style={{ background: '#1e293b', color: '#e5e7eb' }}>
-              {user.username} ({user.email})
-            </option>
-          ))}
-        </select>
-        <button className="cta" onClick={confirmUser}>Confirm</button>
-        <button className="cta secondary" onClick={() => loadLists(userId)} disabled={loadingLists || !userId}>
-          {loadingLists ? "Loading..." : "Refresh"}
-        </button>
-      </div>
+        {/* user row */}
+        <div style={{ ...panelStyle, marginBottom: 14 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <input
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              placeholder="Enter username or email"
+              style={inputStyle}
+            />
+            <button style={buttonStyle} onClick={confirmUser}>
+              Confirm
+            </button>
+            <button
+              style={buttonGhostStyle}
+              onClick={() => loadLists(userId, { keepSelected: true })}
+              disabled={loadingLists || !userId}
+            >
+              {loadingLists ? "Loading..." : "Refresh"}
+            </button>
+          </div>
 
-      {errMsg ? <div style={{ color: "crimson", marginBottom: 16 }}>Error: {errMsg}</div> : null}
-
-      {/* create list */}
-      <div style={{ display: "flex", gap: 12, alignItems: "stretch", marginBottom: 20 }}>
-        <input
-          value={newListName}
-          onChange={(e) => setNewListName(e.target.value)}
-          placeholder="New list name..."
-          style={{ flex: 1 }}
-        />
-
-        <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
-          <select
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '10px',
-              padding: '10px 12px',
-              color: '#e5e7eb',
-              fontFamily: 'inherit',
-              cursor: 'pointer',
-              minWidth: '120px'
-            }}
-          >
-            <option value="private" style={{ background: '#1e293b', color: '#e5e7eb' }}>Private</option>
-            <option value="public" style={{ background: '#1e293b', color: '#e5e7eb' }}>Public</option>
-          </select>
-
-          <button className="cta" onClick={createList} disabled={!userId}>
-            Create
-          </button>
+          {errMsg ? (
+            <div style={{ marginTop: 10, color: "rgba(255,120,140,0.95)", fontWeight: 700 }}>{errMsg}</div>
+          ) : null}
         </div>
-      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 16 }}>
-        {/* left lists (optimization #3) */}
-        <div>
-          <h2 style={{ marginBottom: 12 }}>Your Lists</h2>
+        {/* create list row */}
+        <div style={{ ...panelStyle, marginBottom: 16 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <input
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              placeholder="New list name..."
+              style={inputStyle}
+            />
+            <select value={visibility} onChange={(e) => setVisibility(e.target.value)} style={{ ...inputStyle, flex: "0 0 180px" }}>
+              <option value="private">private</option>
+              <option value="public">public</option>
+            </select>
+            <button style={buttonStyle} onClick={createList} disabled={!userId}>
+              Create
+            </button>
+          </div>
+        </div>
 
-          {lists.length === 0 && !loadingLists ? (
-            <div style={{ opacity: 0.8 }}>No lists yet.</div>
+        {/* Recommended row  */}
+        <div style={{ ...panelStyle, marginBottom: 16 }}>
+          <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 8 }}>Recommended</div>
+          <div style={{ color: "rgba(255,255,255,0.70)", fontSize: 12, marginBottom: 12 }}>
+            Default recommendations from TVMaze search. Add to the opened list.
+          </div>
+
+          {!selectedId ? (
+            <div style={{ color: "rgba(255,255,255,0.65)", marginBottom: 10 }}>
+              Open a list first to add items.
+            </div>
+          ) : null}
+
+          {loadingRec ? (
+            <div style={{ color: "rgba(255,255,255,0.65)" }}>Loading recommendations…</div>
           ) : (
-            <div style={{ display: "grid", gap: 12 }}>
-              {lists.map((l) => {
-                const id = l._id || l.id;
-                const active = selectedId === id;
-                const name = l.list_name || l.name || l.title || "Untitled list";
-                const count = l.items?.length ?? 0;
-
-                return (
-                  <div
-                    key={id}
-                    style={cardStyle(active)}
-                    onClick={() => openList(id)}
-                    onMouseDown={(e) => e.currentTarget.style.transform = "scale(0.995)"}
-                    onMouseUp={(e) => e.currentTarget.style.transform = "scale(1)"}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontWeight: 900, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {name}
-                        </div>
-                        <div style={{ opacity: 0.85, marginTop: 6 }}>
-                          {count} items • {l.visibility || "private"}
-                        </div>
+            <div style={{ overflow: "hidden" }}>
+              <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8 }}>
+                {recommended.map((s) => (
+                  <div key={s.id} style={recCardStyle}>
+                    <img src={s.image || "https://via.placeholder.com/60x90?text=No+Img"} alt="" style={posterStyle} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 900, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {s.name}
                       </div>
-
-                      <div style={{ display: "flex", gap: 8, alignItems: "start" }}>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openList(id);
-                          }}
-                        >
-                          Open
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteList(id);
-                          }}
-                        >
-                          Delete
-                        </button>
+                      <div style={{ opacity: 0.78, fontSize: 12, marginTop: 4 }}>
+                        {s.premiered ? `(${String(s.premiered).slice(0, 4)}) ` : ""}
+                        {typeof s.rating === "number" ? `⭐ ${s.rating}` : ""}
                       </div>
+                      <button
+                        style={{
+                          ...buttonStyle,
+                          marginTop: 10,
+                          width: "100%",
+                          opacity: selectedId ? 1 : 0.5,
+                          cursor: selectedId ? "pointer" : "not-allowed",
+                        }}
+                        disabled={!selectedId}
+                        onClick={() => addShowToSelected(s.id)}
+                      >
+                        Add
+                      </button>
                     </div>
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
           )}
+
+          <div style={{ marginTop: 6, color: "rgba(255,255,255,0.55)", fontSize: 12 }}>
+          </div>
         </div>
 
-        {/* right detail */}
-        {selected && (
-        <div>
-          <h2 style={{ marginBottom: 12 }}>List Detail</h2>
+        {/* 2 columns: Lists + Detail */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.7fr", gap: 16 }}>
+          {/* Lists */}
+          <div style={panelStyle}>
+            <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 12 }}>Your Lists</div>
 
-          <div style={{ border: "1px solid #333", borderRadius: 14, padding: 14 }}>
-              <div style={{ fontWeight: 950, marginBottom: 6 }}>
-                {selected.list_name || selected.name || selected.title || "List"}
-              </div>
-              {selected.visibility ? (
-                <div style={{ opacity: 0.85, marginBottom: 10 }}>visibility: {selected.visibility}</div>
-              ) : null}
+            {lists.length === 0 ? (
+              <div style={{ color: "rgba(255,255,255,0.65)" }}>No lists yet.</div>
+            ) : (
+              <div style={{ display: "grid", gap: 12 }}>
+                {lists.map((l) => {
+                  const id = l._id || l.id;
+                  const active = selectedId === id;
+                  const name = l.list_name || "Untitled list";
+                  const count = l.items?.length ?? 0;
 
-              {/* search + add (optimization #1) */}
-              <div style={{ marginTop: 10, marginBottom: 14, border: "1px solid #333", borderRadius: 14, padding: 12 }}>
-                <div style={{ fontWeight: 900, marginBottom: 8 }}>Search movies & TV shows</div>
-
-                <div style={{ marginBottom: 10 }}>
-                  <select
-                    value={contentTypeFilter}
-                    onChange={(e) => setContentTypeFilter(e.target.value)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid #333',
-                      borderRadius: '10px',
-                      padding: '10px 12px',
-                      color: '#e5e7eb',
-                      fontFamily: 'inherit',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      width: '100%'
-                    }}
-                  >
-                    <option value="all" style={{ background: '#1e293b', color: '#e5e7eb' }}>All (Movies & TV Shows)</option>
-                    <option value="movie" style={{ background: '#1e293b', color: '#e5e7eb' }}>Movies Only</option>
-                    <option value="tv" style={{ background: '#1e293b', color: '#e5e7eb' }}>TV Shows Only</option>
-                  </select>
-                </div>
-
-                <div style={{ display: "flex", gap: 10 }}>
-                  <input
-                    value={showQuery}
-                    onChange={(e) => setShowQuery(e.target.value)}
-                    onKeyDown={onSearchKeyDown}
-                    placeholder="Type a title (press Enter)"
-                  />
-                  <button className="cta" onClick={searchShows} disabled={searching || !showQuery.trim()}>
-                    {searching ? "Searching..." : "Search"}
-                  </button>
-                </div>
-
-                {searchErr ? <div style={{ color: "crimson", marginTop: 8 }}>Search: {searchErr}</div> : null}
-
-                {searchResults.length > 0 ? (
-                  <ul style={{ listStyle: "none", padding: 0, marginTop: 12, display: "grid", gap: 10 }}>
-                    {searchResults
-                      .filter(s => {
-                        if (contentTypeFilter === 'all') return true;
-                        if (contentTypeFilter === 'movie') return s.type === 'Movie';
-                        if (contentTypeFilter === 'tv') return s.type === 'TV Show';
-                        return true;
-                      })
-                      .slice(0, 10).map((s) => {
-                      const full = stripHtml(s.summary);
-                      const isOpen = !!previewOpen[s.id];
-                      const short = full.slice(0, 160);
-
-                      return (
-                        <li
-                          key={s.id}
-                          style={{
-                            border: "1px solid #333",
-                            borderRadius: 12,
-                            padding: 10,
-                            display: "flex",
-                            gap: 12,
-                            alignItems: "center",
-                          }}
-                        >
-                          <img
-                            src={s.image || "https://via.placeholder.com/70x105?text=No+Img"}
-                            alt=""
-                            style={{ width: 70, height: 105, objectFit: "cover", borderRadius: 10 }}
-                          />
-
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontWeight: 950 }}>
-                              {s.name}{" "}
-                              <span style={{ opacity: 0.6, fontWeight: 600, fontSize: 13 }}>
-                                {s.type ? `[${s.type}]` : ""}
-                              </span>
-                            </div>
-
-                            <div style={{ opacity: 0.85, fontSize: 12, marginTop: 4 }}>
-                              {typeof s.rating === "number" ? `⭐ ${s.rating}  ` : ""}
-                              {Array.isArray(s.genres) && s.genres.length ? `• ${s.genres.slice(0, 3).join(", ")}` : ""}
-                            </div>
-
-                            {full ? (
-                              <div style={{ opacity: 0.9, fontSize: 12, marginTop: 6, lineHeight: 1.35 }}>
-                                {isOpen ? full : short + (full.length > 160 ? "..." : "")}
-                                {full.length > 160 ? (
-                                  <>
-                                    {" "}
-                                    <button
-                                      onClick={() => togglePreview(s.id)}
-                                      style={{ marginLeft: 6, fontSize: 12 }}
-                                    >
-                                      {isOpen ? "Hide" : "Preview"}
-                                    </button>
-                                  </>
-                                ) : null}
-                              </div>
-                            ) : null}
+                  return (
+                    <div key={id} style={listCardStyle(active)} onClick={() => openList(id)}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontWeight: 950, fontSize: 16, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {name}
                           </div>
-
-                          <button onClick={() => addShowId(s.id)}>Add</button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : null}
-              </div>
-
-              {/* items + sort (optimization #2) */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <div style={{ fontWeight: 900 }}>Items</div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span style={{ opacity: 0.85 }}>Sort:</span>
-                  <select
-                    value={sortMode}
-                    onChange={(e) => setSortMode(e.target.value)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '10px',
-                      padding: '8px 10px',
-                      color: '#e5e7eb',
-                      fontFamily: 'inherit',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <option value="added-newest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Added (newest)</option>
-                    <option value="added-oldest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Added (oldest)</option>
-                    <option value="name-asc" style={{ background: '#1e293b', color: '#e5e7eb' }}>Name (A → Z)</option>
-                    <option value="name-desc" style={{ background: '#1e293b', color: '#e5e7eb' }}>Name (Z → A)</option>
-                  </select>
-                </div>
-              </div>
-
-              {selected.items?.length ? (
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
-                  {sortedItems.map((it, idx) => {
-                    const sid = it.showid != null ? String(it.showid) : null;
-                    const show = sid ? showCache[sid] : null;
-
-                    const title = show?.name || (sid ? `Not Found (showid: ${sid})` : `Unknown item ${idx}`);
-                    const summary = stripHtml(show?.summary);
-                    const year = show?.premiered ? String(show.premiered).slice(0, 4) : "";
-                    const rating = typeof show?.rating === "number" ? show.rating : null;
-
-                    return (
-                      <li key={sid || idx} style={{ border: "1px solid #333", borderRadius: 12, padding: 10 }}>
-                        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                          <img
-                            src={show?.image || "https://via.placeholder.com/70x105?text=No+Img"}
-                            alt=""
-                            style={{ width: 70, height: 105, objectFit: "cover", borderRadius: 10 }}
-                          />
-
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontWeight: 950 }}>{title}</div>
-                            <div style={{ opacity: 0.85, fontSize: 12, marginTop: 4 }}>
-                              {year ? `Year: ${year}  ` : ""}
-                              {rating != null ? `⭐ ${rating}` : ""}
-                            </div>
-
-                            {summary ? (
-                              <div style={{ opacity: 0.9, fontSize: 12, marginTop: 6, lineHeight: 1.35 }}>
-                                {summary.slice(0, 180)}
-                                {summary.length > 180 ? "..." : ""}
-                              </div>
-                            ) : null}
+                          <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", opacity: 0.85, fontSize: 12 }}>
+                            <span>{count} items</span>
+                            <span>• {l.visibility || "private"}</span>
                           </div>
-
-                          <button onClick={() => removeShowId(it)}>Remove</button>
                         </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <div style={{ opacity: 0.8 }}>No items in this list.</div>
-              )}
-            </div>
+
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <button
+                            style={buttonGhostStyle}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openList(id);
+                            }}
+                          >
+                            Open
+                          </button>
+                          <button
+                            style={buttonDangerStyle}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteList(id);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Detail */}
+          <div style={panelStyle}>
+            <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 12 }}>List Detail</div>
+
+            {!selected ? (
+              <div style={{ color: "rgba(255,255,255,0.65)" }}>Select a list to view items.</div>
+            ) : (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+                  <div style={{ fontSize: 22, fontWeight: 950 }}>{selected.list_name}</div>
+                  <div style={{ fontSize: 12, opacity: 0.8 }}>visibility: {selected.visibility}</div>
+                </div>
+
+                {/* search add */}
+                <div style={{ marginTop: 12, ...panelStyle, boxShadow: "none" }}>
+                  <div style={{ fontWeight: 900, marginBottom: 10 }}>Search & Add</div>
+
+                  <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                    <input
+                      value={showQuery}
+                      onChange={(e) => setShowQuery(e.target.value)}
+                      onKeyDown={onSearchKeyDown}
+                      placeholder="Search show name (press Enter)"
+                      style={inputStyle}
+                    />
+                    <button style={buttonStyle} onClick={searchShows} disabled={searching || !showQuery.trim()}>
+                      {searching ? "Searching..." : "Search"}
+                    </button>
+                  </div>
+
+                  {searchErr ? (
+                    <div style={{ marginTop: 10, color: "rgba(255,120,140,0.95)", fontWeight: 700 }}>{searchErr}</div>
+                  ) : null}
+
+                  {searchResults.length > 0 ? (
+                    <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
+                      {searchResults.slice(0, 8).map((s) => {
+                        const summary = stripHtml(s.summary);
+                        return (
+                          <div key={s.id} style={rowStyle}>
+                            <img src={s.image || "https://via.placeholder.com/60x90?text=No+Img"} alt="" style={posterStyle} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 950, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {s.name}{" "}
+                                <span style={{ opacity: 0.75, fontWeight: 800 }}>
+                                  {s.premiered ? `(${String(s.premiered).slice(0, 4)})` : ""}
+                                </span>
+                              </div>
+                              <div style={{ opacity: 0.8, fontSize: 12, marginTop: 4 }}>
+                                {typeof s.rating === "number" ? `⭐ ${s.rating}  ` : ""}
+                                {Array.isArray(s.genres) && s.genres.length ? `• ${s.genres.slice(0, 3).join(", ")}` : ""}
+                              </div>
+                              {summary ? (
+                                <div style={{ opacity: 0.9, fontSize: 12, marginTop: 6, lineHeight: 1.35 }}>
+                                  {summary.slice(0, 140)}
+                                  {summary.length > 140 ? "..." : ""}
+                                </div>
+                              ) : null}
+                            </div>
+                            <button style={buttonStyle} onClick={() => addShowToSelected(s.id)}>
+                              Add
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* items */}
+                <div style={{ marginTop: 14 }}>
+                  <div style={{ fontWeight: 950, marginBottom: 10 }}>Items</div>
+
+                  {selected.items?.length ? (
+                    <div style={{ display: "grid", gap: 10 }}>
+                      {selected.items.map((it, idx) => {
+                        const sid = it.showid != null ? String(it.showid) : null;
+                        const show = sid ? showCache[sid] : null;
+
+                        return (
+                          <div key={sid || idx} style={rowStyle}>
+                            <img src={show?.image || "https://via.placeholder.com/60x90?text=No+Img"} alt="" style={posterStyle} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 950 }}>
+                                {show?.name || (sid ? `Not Found (showid: ${sid})` : "Unknown")}
+                              </div>
+                              <div style={{ opacity: 0.8, fontSize: 12, marginTop: 4 }}>
+                                {show?.premiered ? `(${String(show.premiered).slice(0, 4)}) ` : ""}
+                                {typeof show?.rating === "number" ? `⭐ ${show.rating}` : ""}
+                              </div>
+                              {show?.summary ? (
+                                <div style={{ opacity: 0.9, fontSize: 12, marginTop: 6, lineHeight: 1.35 }}>
+                                  {stripHtml(show.summary).slice(0, 140)}
+                                  {stripHtml(show.summary).length > 140 ? "..." : ""}
+                                </div>
+                              ) : null}
+                            </div>
+
+                            <button style={buttonDangerStyle} onClick={() => removeShowFromSelected(sid)}>
+                              Remove
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div style={{ color: "rgba(255,255,255,0.65)" }}>No items in this list.</div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
-        )}
       </div>
     </div>
   );
