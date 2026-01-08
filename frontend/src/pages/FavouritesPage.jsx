@@ -387,6 +387,7 @@ export default function FavouritesPage() {
 
         {/* user row */}
         <div style={{ ...panelStyle, marginBottom: 14 }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9em', color: '#9ca3af' }}>User</label>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <select
               value={selectedUserId}
@@ -417,6 +418,7 @@ export default function FavouritesPage() {
 
         {/* create list row */}
         <div style={{ ...panelStyle, marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9em', color: '#9ca3af' }}>New list</label>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <input
               value={newListName}
