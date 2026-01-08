@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import UsersPage from './pages/UsersPage.jsx'
 import FavouritesPage from './pages/FavouritesPage.jsx'
 import PostsPage from './pages/PostsPage.jsx'
@@ -22,10 +22,10 @@ function App () {
         <div className="topbar__inner">
           <div className="brand">ReelEcho</div>
           <nav className="menu">
-            <Link to="/users">Users</Link>
-            <Link to="/favourites">Favourites</Link>
-            <Link to="/posts">Posts</Link>
-            <Link to="/reviews">Reviews</Link>
+            <NavLink to="/users">Users</NavLink>
+            <NavLink to="/favourites">Favourites</NavLink>
+            <NavLink to="/posts">Posts</NavLink>
+            <NavLink to="/reviews">Reviews</NavLink>
           </nav>
         </div>
       </header>

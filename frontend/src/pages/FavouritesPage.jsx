@@ -31,17 +31,12 @@ function stripHtml(html) {
   return String(html || "").replace(/<[^>]*>/g, "").trim();
 }
 
-async function resolveUserId(input) {
-  const users = await request("/api/users");
-  const found = users.find((u) => u.username === input || u.email === input);
-  if (!found) throw new Error("User not found by username/email");
-  return found._id;
-}
-
 export default function FavouritesPage() {
   // user
-  const [userInput, setUserInput] = useState(localStorage.getItem("userid_input") || "");
+  const [selectedUserId, setSelectedUserId] = useState(localStorage.getItem("userid") || "");
   const [userId, setUserId] = useState(localStorage.getItem("userid") || "");
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   // lists
   const [lists, setLists] = useState([]);
@@ -70,6 +65,26 @@ export default function FavouritesPage() {
   const [errMsg, setErrMsg] = useState("");
 
   const selectedId = useMemo(() => (selected?._id || selected?.id || null), [selected]);
+
+  /* ---------- data: users ---------- */
+  useEffect(() => {
+    (async () => {
+      setUsersLoading(true);
+      try {
+        const data = await request("/api/users");
+        setUsers(Array.isArray(data) ? data : []);
+        const savedId = localStorage.getItem("userid");
+        const initialId = (savedId && data.find((u) => u._id === savedId)?._id) || data[0]?._id || "";
+        if (!selectedUserId && initialId) setSelectedUserId(initialId);
+        if (!userId && initialId) setUserId(initialId);
+      } catch (e) {
+        setErrMsg(e.message || "Failed to load users");
+      } finally {
+        setUsersLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* ---------- styles ---------- */
   const pageStyle = {
@@ -175,15 +190,12 @@ export default function FavouritesPage() {
   async function confirmUser() {
     setErrMsg("");
     try {
-      const input = userInput.trim();
-      if (!input) throw new Error("Please enter username or email.");
-      const realUserId = await resolveUserId(input);
+      if (!selectedUserId) throw new Error("Please select a user.");
 
-      setUserId(realUserId);
-      localStorage.setItem("userid", realUserId);
-      localStorage.setItem("userid_input", input);
+      setUserId(selectedUserId);
+      localStorage.setItem("userid", selectedUserId);
 
-      await loadLists(realUserId, { keepSelected: false });
+      await loadLists(selectedUserId, { keepSelected: false });
     } catch (e) {
       setErrMsg(e.message || "Failed to confirm user");
       setUserId("");
@@ -369,29 +381,33 @@ export default function FavouritesPage() {
   }, []);
 
   return (
-    <div style={pageStyle}>
-      <div style={containerStyle}>
-        <h1 style={{ fontSize: 44, fontWeight: 900, margin: "0 0 16px" }}>Favourites</h1>
+    <div className="page">
+      <div className="users-page panel">
+        <h2 style={{ textAlign: "center", marginBottom: "20px", letterSpacing: "-0.01em" }}>Favourites</h2>
 
         {/* user row */}
         <div style={{ ...panelStyle, marginBottom: 14 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <input
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              placeholder="Enter username or email"
+            <select
+              value={selectedUserId}
+              onChange={(e) => {
+                const newUserId = e.target.value;
+                setSelectedUserId(newUserId);
+                setUserId(newUserId);
+                localStorage.setItem("userid", newUserId);
+                if (newUserId) {
+                  loadLists(newUserId, { keepSelected: false });
+                }
+              }}
               style={inputStyle}
-            />
-            <button style={buttonStyle} onClick={confirmUser}>
-              Confirm
-            </button>
-            <button
-              style={buttonGhostStyle}
-              onClick={() => loadLists(userId, { keepSelected: true })}
-              disabled={loadingLists || !userId}
             >
-              {loadingLists ? "Loading..." : "Refresh"}
-            </button>
+              {users.length === 0 && <option value="">Loading users...</option>}
+              {users.map(user => (
+                <option key={user._id} value={user._id}>
+                  {user.username} ({user.email})
+                </option>
+              ))}
+            </select>
           </div>
 
           {errMsg ? (
@@ -409,8 +425,8 @@ export default function FavouritesPage() {
               style={inputStyle}
             />
             <select value={visibility} onChange={(e) => setVisibility(e.target.value)} style={{ ...inputStyle, flex: "0 0 180px" }}>
-              <option value="private">private</option>
-              <option value="public">public</option>
+              <option value="private">Private</option>
+              <option value="public">Public</option>
             </select>
             <button style={buttonStyle} onClick={createList} disabled={!userId}>
               Create
@@ -496,7 +512,7 @@ export default function FavouritesPage() {
                           </div>
                           <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", opacity: 0.85, fontSize: 12 }}>
                             <span>{count} items</span>
-                            <span>• {l.visibility || "private"}</span>
+                            <span>• {(l.visibility || "private").charAt(0).toUpperCase() + (l.visibility || "private").slice(1)}</span>
                           </div>
                         </div>
 
@@ -538,7 +554,7 @@ export default function FavouritesPage() {
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
                   <div style={{ fontSize: 22, fontWeight: 950 }}>{selected.list_name}</div>
-                  <div style={{ fontSize: 12, opacity: 0.8 }}>visibility: {selected.visibility}</div>
+                  <div style={{ fontSize: 12, opacity: 0.8 }}>visibility: {selected.visibility.charAt(0).toUpperCase() + selected.visibility.slice(1)}</div>
                 </div>
 
                 {/* search add */}

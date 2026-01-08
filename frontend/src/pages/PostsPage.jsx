@@ -26,7 +26,7 @@ export default function PostsPage () {
   })
 
   return (
-    <div className="posts-page panel">
+    <div className="users-page panel">
       <h2>Posts</h2>
 
       <PostForm onCreated={reload} />

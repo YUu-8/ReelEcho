@@ -120,6 +120,7 @@ export default function PostForm ({ onCreated }) {
 
   return (
     <form className="user-form" onSubmit={handleSubmit}>
+      <h3 style={{ marginTop: 0, marginBottom: '16px' }}>Create your post</h3>
       <div>
         <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9em', color: '#9ca3af' }}>User</label>
         <select

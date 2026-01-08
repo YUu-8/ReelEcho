@@ -70,6 +70,12 @@ a { color: inherit; text-decoration: none; }
   color: white;
 }
 
+.menu a.active {
+  background: linear-gradient(145deg, #38bdf8, #22d3ee);
+  color: #062138;
+  font-weight: 700;
+}
+
 .page {
   max-width: 1100px;
   margin: 40px auto;
@@ -144,7 +150,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .users-page {
-  max-width: 760px;
+  max-width: 912px;
   margin: 30px auto 0;
 }
 
@@ -152,11 +158,13 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
   margin-bottom: 20px;
   letter-spacing: -0.01em;
+  font-size: 2rem;
+  font-weight: 600;
 }
 
 .users-page form,
 .users-page ul {
-  max-width: 640px;
+  max-width: 768px;
   margin: 0 auto 18px;
 }
 
@@ -209,7 +217,8 @@ button:active { transform: translateY(0); box-shadow: none; }
 }
 
 input,
-textarea {
+textarea,
+select {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
@@ -217,6 +226,20 @@ textarea {
   color: var(--text);
   width: 100%;
   font-family: inherit;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5e7eb' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+option {
+  background: #0f172a;
+  color: var(--text);
 }
 
 textarea {
@@ -227,3 +250,24 @@ form div { margin-bottom: 10px; }
 .user-form { margin-bottom: 16px; }
 
 h1, h2 { margin: 0 0 16px; }
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.4);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.6);
+}
