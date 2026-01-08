@@ -31,27 +31,25 @@ export default function PostsPage () {
 
       <PostForm onCreated={reload} />
 
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', gap: '8px', flexWrap: 'nowrap' }}>
+        <label style={{ color: '#9ca3af', fontSize: '0.9em', whiteSpace: 'nowrap' }}>Sort by:</label>
+        <select
+          value={sortMode}
+          onChange={(e) => setSortMode(e.target.value)}
+          style={{
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '8px',
+            padding: '6px 10px',
+            color: '#e5e7eb',
+            fontFamily: 'inherit',
+            cursor: 'pointer'
+          }}
+        >
+          <option value="newest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Latest First</option>
+          <option value="oldest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Oldest First</option>
+        </select>
         <button className="cta secondary" onClick={reload}>Refresh</button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <label style={{ color: '#9ca3af', fontSize: '0.9em' }}>Sort by:</label>
-          <select
-            value={sortMode}
-            onChange={(e) => setSortMode(e.target.value)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '8px',
-              padding: '6px 10px',
-              color: '#e5e7eb',
-              fontFamily: 'inherit',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="newest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Latest First</option>
-            <option value="oldest" style={{ background: '#1e293b', color: '#e5e7eb' }}>Oldest First</option>
-          </select>
-        </div>
       </div>
 
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}

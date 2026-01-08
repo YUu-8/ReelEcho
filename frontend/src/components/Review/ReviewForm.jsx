@@ -274,7 +274,7 @@ const ReviewForm = ({ onSubmitSuccess }) => {
       
       <div>
         <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9em', color: '#9ca3af' }}>Emoji</label>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '8px' }}>
           {['😀', '😊', '😍', '🤩', '😎', '😢', '😭', '😡', '🤔', '😴', '🤗', '😱', '🥳', '🤯', '😐', '🙄', '😌', '🤑'].map((emoji) => (
             <button
               key={emoji}
